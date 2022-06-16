@@ -31,6 +31,7 @@ def gradient_reduced_LJPotential(x, y, d2):
     ry = y/d2   # direction y
     k = (1/d2)**3
     s = 24 * (k - 2 * k**2)  # strength
+    # assert s < 1e5
     return s*rx, s*ry
 
 
@@ -129,6 +130,7 @@ def vec_updater(grid, posx, posy, vecx, vecy,
                             # Calculate the interaction
                             #=========================================================
                             vpx, vpy = gradient_reduced_LJPotential(x_diff, y_diff, d2)
+                            # assert vpx < 1e6 and vpy < 1e6
                             vecx[i] -= vpx
                             vecy[i] -= vpy
                             vecx[j] += vpx
@@ -199,12 +201,29 @@ def dynamics(grid, posx, posy, vecx, vecy, theta, s_x, s_y, s_theta, Pe, M, Lx, 
     d_theta = sqrt6 * s_theta
     return vecx, vecy, d_theta
 
+# @jit(nopython=NOPYTHON)
+# def euler_updater(step, grid, posx, posy, vecx, vecy, theta, s_x, s_y, s_theta, Pe, M, Lx, Ly):
+#     dx, dy, d_theta = dynamics(grid, posx, posy, vecx, vecy, theta, s_x, s_y, s_theta, Pe, M, Lx, Ly)
+#     # assert max(dx<1e6) and max(dy<1e6)
+#     posx += step * dx
+#     posy += step * dy
+#     theta += step * d_theta
+#
+#     # Over-damping
+#     vecx.fill(0)
+#     vecy.fill(0)
+
 @jit(nopython=NOPYTHON)
 def updater(step, grid, posx, posy, vecx, vecy, theta, s_x, s_y, s_theta, Pe, M, Lx, Ly):
     dx, dy, d_theta = dynamics(grid, posx, posy, vecx, vecy, theta, s_x, s_y, s_theta, Pe, M, Lx, Ly)
+    # assert max(dx<1e6) and max(dy<1e6)
     posx += step * dx
     posy += step * dy
-    theta += step * d_theta
+    theta += np.sqrt(step) * d_theta
+
+    # Over-damping
+    vecx.fill(0)
+    vecy.fill(0)
 
 @jit(nopython=NOPYTHON)
 def run(step, grid, posx, posy, vecx, vecy, theta, Pe, N, M, Lx, Ly):
@@ -212,8 +231,7 @@ def run(step, grid, posx, posy, vecx, vecy, theta, Pe, N, M, Lx, Ly):
     s_y = np.random.randn(N)
     s_theta = np.random.randn(N)
     updater(step, grid, posx, posy, vecx, vecy, theta, s_x, s_y, s_theta, Pe, M, Lx, Ly)
-    vecx.fill(0)
-    vecy.fill(0)
+
     posx = np.remainder(posx, Lx).astype(np.float32)
     posy = np.remainder(posy, Ly).astype(np.float32)
     theta = np.remainder(theta, 2 * np.pi).astype(np.float32)
