@@ -8,8 +8,8 @@ from matplotlib.animation import FuncAnimation, PillowWriter
 
 from utils import *
 
-NOPYTHON = False
-# NOPYTHON = True
+# NOPYTHON = False
+NOPYTHON = True
 sqrt6 = np.sqrt(6)
 sqrt2 = np.sqrt(2)
 root32 = 2**(1/3)
@@ -25,7 +25,7 @@ def gradient_reduced_LJPotential(x, y, d2):
     :param x: difference on x between two points
     :param y: difference on y between two points
     :param d2: squared distance d2 = x^2 + y^2
-    :return: the gradient vector dx, dy
+    :return: the gradient ptor dx, dy
     '''
     rx = x/d2   # direction x
     ry = y/d2   # direction y
@@ -36,27 +36,27 @@ def gradient_reduced_LJPotential(x, y, d2):
 
 
 @jit(nopython=NOPYTHON, parallel=True)
-def vec_updater(grid, posx, posy, vecx, vecy,
+def p_updater(grid, qx, qy, px, py,
                 M, Lx, Ly):
     '''
         Calculate the velocity of particles
 
     :param grid: list[int], contains the indices of particles in the grids
-    :param posx: list[float], x position of particles
-    :param posy: list[float], y position of particles
-    :param vecx: list[float], x velocity of particles
-    :param vecy: list[float], y velocity of particles
+    :param qx: list[float], x qition of particles
+    :param qy: list[float], y qition of particles
+    :param px: list[float], x velocity of particles
+    :param py: list[float], y velocity of particles
     :param M: M**2 is the number of grids
     :param Lx: the size of the box in x
     :param Ly: the size of the box in y
-    :return: the velocity vectors
+    :return: the velocity ptors
     '''
     #================================================
     # 1. get info for the current grid, find neighbour grid
     #================================================
     for idx_grid in prange(len(grid)):
         # 1.1 get the points in the current grid
-        points = grid[idx_grid]
+        points = grid[idx_grid]  # list[int] of indices of particles
 
         # 1.2 the grid location
         indx = idx_grid%M
@@ -82,16 +82,22 @@ def vec_updater(grid, posx, posy, vecx, vecy,
                 j = points[len(points)-idx_j-1] # second particle
                 if i == j: continue
 
-                x1 = posx[i]
-                x2 = posx[j]
+                x1 = qx[i]
+                x2 = qx[j]
+
+                if is_bdy:  # Boundary effect
+                    if x2 > x1 + Lx/2: x2 = x2 - Lx
+                    if x1 > x2 + Lx/2: x1 = x1 - Lx
                 x_diff = x1 - x2
-                if is_bdy: x_diff = min(x_diff, Lx - x1 + x2) # boundary effect
+                
                 if  root62n < x_diff < root62: # close enough in x direction
 
-                    y1 = posy[i]
-                    y2 = posy[j]
+                    y1 = qy[i]
+                    y2 = qy[j]
+                    if is_bdy:  # Boundary effect
+                        if y2 > y1 + Ly/2: y2 = y2 - Ly
+                        if y1 > y2 + Ly/2: y1 = y1 - Ly
                     y_diff = y1 - y2
-                    if is_bdy: y_diff = min(y_diff, Ly - y1 + y2) # boundary effect
                     if root62n < y_diff < root62: # close enough in y direction
 
                         d2 = x_diff ** 2 + y_diff ** 2
@@ -100,10 +106,10 @@ def vec_updater(grid, posx, posy, vecx, vecy,
                             # Calculate the interaction
                             #=========================================================
                             vpx, vpy = gradient_reduced_LJPotential(x_diff, y_diff, d2)
-                            vecx[i] -= vpx
-                            vecy[i] -= vpy
-                            vecx[j] += vpx
-                            vecy[j] += vpy
+                            px[i] -= vpx
+                            py[i] -= vpy
+                            px[j] += vpx
+                            py[j] += vpy
 
             #======================================================
             # 4. Collide Detection in the neighbour grid
@@ -112,16 +118,20 @@ def vec_updater(grid, posx, posy, vecx, vecy,
                 j = neighbour_points[idx_j] # second particle
                 if i == j: continue
 
-                x1 = posx[i]
-                x2 = posx[j]
+                x1 = qx[i]
+                x2 = qx[j]
+                if is_bdy:  # Boundary effect
+                    if x2 > x1 + Lx/2: x2 = x2 - Lx
+                    if x1 > x2 + Lx/2: x1 = x1 - Lx
                 x_diff = x1 - x2
-                if is_bdy: x_diff = min(x_diff, Lx - x1 + x2) # boundary effect
                 if  root62n < x_diff < root62: # close enough in x direction
 
-                    y1 = posy[i]
-                    y2 = posy[j]
+                    y1 = qy[i]
+                    y2 = qy[j]
+                    if is_bdy:  # Boundary effect
+                        if y2 > y1 + Ly/2: y2 = y2 - Ly
+                        if y1 > y2 + Ly/2: y1 = y1 - Ly
                     y_diff = y1 - y2
-                    if is_bdy: y_diff = min(y_diff, Ly - y1 + y2) # boundary effect
                     if root62n < y_diff < root62: # close enough in y direction
 
                         d2 = x_diff ** 2 + y_diff ** 2
@@ -131,10 +141,10 @@ def vec_updater(grid, posx, posy, vecx, vecy,
                             #=========================================================
                             vpx, vpy = gradient_reduced_LJPotential(x_diff, y_diff, d2)
                             # assert vpx < 1e6 and vpy < 1e6
-                            vecx[i] -= vpx
-                            vecy[i] -= vpy
-                            vecx[j] += vpx
-                            vecy[j] += vpy
+                            px[i] -= vpx
+                            py[i] -= vpy
+                            px[j] += vpx
+                            py[j] += vpy
 
 def grid_init(M):
     grid = List()
@@ -161,7 +171,7 @@ def get_cal_range(grid, indx, indy, M):
     return r+t+tl+tr
 
 @jit(nopython=NOPYTHON, parallel=True)
-def grid_seperation(grid, posx, posy, M, Lx, Ly):
+def grid_seperation(grid, qx, qy, M, Lx, Ly):
     '''
       For G(indx, indy), the index is $ind = indy * M + indx$
       Get the range in the following grid denoted by O. and skip X
@@ -173,9 +183,9 @@ def grid_seperation(grid, posx, posy, M, Lx, Ly):
             indx
     '''
     M = int(M)
-    N = len(posx)
-    idx = (posx // (Lx/M)).astype(np.int64)
-    idy = (posy // (Ly/M)).astype(np.int64)
+    N = len(qx)
+    idx = (qx // (Lx/M)).astype(np.int64)
+    idy = (qy // (Ly/M)).astype(np.int64)
     # idx = np.array([M+x if x<0 else x for x in idx])
     # idy = np.array([M+x if x<0 else x for x in idy])
     lst = [[0] for _ in range(M**2)]
@@ -192,47 +202,51 @@ def grid_seperation(grid, posx, posy, M, Lx, Ly):
     return grid
 
 @jit(nopython=NOPYTHON)
-def dynamics(grid, posx, posy, vecx, vecy, theta, s_x, s_y, s_theta, Pe, M, Lx, Ly):
-    vec_updater(grid, posx, posy, vecx, vecy, M, Lx, Ly)
-    vecx += Pe * np.cos(theta)
-    vecy += Pe * np.sin(theta)
-    vecx += sqrt2 * s_x
-    vecy += sqrt2 * s_y
-    d_theta = sqrt6 * s_theta
-    return vecx, vecy, d_theta
+def dynamics(grid, qx, qy, px, py, theta, Pe, M, Lx, Ly):
+    """
+        Calculate the velocity of the particles under
+        1.  LJ-Potential
+        2.  Self-Proportional force
 
-# @jit(nopython=NOPYTHON)
-# def euler_updater(step, grid, posx, posy, vecx, vecy, theta, s_x, s_y, s_theta, Pe, M, Lx, Ly):
-#     dx, dy, d_theta = dynamics(grid, posx, posy, vecx, vecy, theta, s_x, s_y, s_theta, Pe, M, Lx, Ly)
-#     # assert max(dx<1e6) and max(dy<1e6)
-#     posx += step * dx
-#     posy += step * dy
-#     theta += step * d_theta
-#
-#     # Over-damping
-#     vecx.fill(0)
-#     vecy.fill(0)
+    :return:
+    """
+    p_updater(grid, qx, qy, px, py, M, Lx, Ly)
+    px += Pe * np.cos(theta)
+    py += Pe * np.sin(theta)
+    return px, py
+
 
 @jit(nopython=NOPYTHON)
-def updater(step, grid, posx, posy, vecx, vecy, theta, s_x, s_y, s_theta, Pe, M, Lx, Ly):
-    dx, dy, d_theta = dynamics(grid, posx, posy, vecx, vecy, theta, s_x, s_y, s_theta, Pe, M, Lx, Ly)
-    # assert max(dx<1e6) and max(dy<1e6)
-    posx += step * dx
-    posy += step * dy
-    theta += np.sqrt(step) * d_theta
-
+def updater(step, grid, qx, qy, px, py, theta, s_x, s_y, s_theta, Pe, M, Lx, Ly):
+    """
+        Update the position and velocity
+        Update the Stochastic Brownian motion
+    :return:
+    """
+    sqrt_step = np.sqrt(step)
     # Over-damping
-    vecx.fill(0)
-    vecy.fill(0)
+    px.fill(0)
+    py.fill(0)
+
+    dx, dy = dynamics(grid, qx, qy, px, py, theta, Pe, M, Lx, Ly)
+
+    qx += step * dx + sqrt2 * sqrt_step * s_x
+    qy += step * dy + sqrt2 * sqrt_step * s_y
+    theta += sqrt6 * sqrt_step * s_theta
+
 
 @jit(nopython=NOPYTHON)
-def run(step, grid, posx, posy, vecx, vecy, theta, Pe, N, M, Lx, Ly):
+def run(step, grid, qx, qy, px, py, theta, Pe, N, M, Lx, Ly):
+    # generate random variable
     s_x = np.random.randn(N)
     s_y = np.random.randn(N)
     s_theta = np.random.randn(N)
-    updater(step, grid, posx, posy, vecx, vecy, theta, s_x, s_y, s_theta, Pe, M, Lx, Ly)
 
-    posx = np.remainder(posx, Lx).astype(np.float32)
-    posy = np.remainder(posy, Ly).astype(np.float32)
+    # update the position q and velocity p
+    updater(step, grid, qx, qy, px, py, theta, s_x, s_y, s_theta, Pe, M, Lx, Ly)
+
+    # fold back the periodic points
+    qx = np.remainder(qx, Lx).astype(np.float32)
+    qy = np.remainder(qy, Ly).astype(np.float32)
     theta = np.remainder(theta, 2 * np.pi).astype(np.float32)
-    return posx, posy, vecx, vecy, theta
+    return qx, qy, px, py, theta

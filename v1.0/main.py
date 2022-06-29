@@ -2,45 +2,45 @@ from src import *
 
 def main():
     def init(N):
-        coords = generate_points_with_min_distance(n=N, shape=(Lx*0.98, Ly*0.98), min_dist=2)
-        posx = np.array(coords[:,0])
-        posy = np.array(coords[:,1])
+        coords = generate_points_with_min_distance(n=N, shape=(Lx*0.98, Ly*0.98), min_dist=1)
+        qx = np.array(coords[:,0])
+        qy = np.array(coords[:,1])
         theta = np.random.randn(N)
 
-        vecx = np.zeros(N)
-        vecy = np.zeros(N)
-        return posx, posy, vecx, vecy, theta
+        px = np.zeros(N)
+        py = np.zeros(N)
+        return qx, qy, px, py, theta
 
     # Hyper-parameters
-    epoch = int(1e4)
+    epoch = int(2e5)
 
-    N = 15625  # number of particles
-    M = 70
-    Lx = 260 # box size x
-    Ly = 260 # box size y
+    N = 10000  # number of particles
+    M = 60
+    Lx = 120 # box size x
+    Ly = 120 # box size y
     step = 5e-6
-    Pe = 100 #Peclet number
+    Pe = 120 #Peclet number
     is_save = True
-    is_load = False
+    is_load = True
     is_show = False
     savepoint=0
+    np.random.seed(714)
 
     # Initialization ===============================================
-    posx, posy, vecx, vecy, theta = init(N)
-    print(posx.shape)
+    qx, qy, px, py, theta = init(N)
     grid = grid_init(M)
 
     if is_load:
-        savepoint = 4600
-        data = load("./results/state"+str(savepoint)+".npz")
-        posx = data['px']
-        posy = data['py']
-        vecx = data['vx']
-        vecy = data['vy']
+        savepoint = 1703300
+        data = load("./results/"+str(savepoint)+".npz")
+        qx = data['qx']
+        qy = data['qy']
+        px = data['px']
+        py = data['py']
         theta = data['theta']
         print("=========Load savepoint successfully=========")
     if is_show:
-        display(posx, posy)
+        display(qx, qy)
         plt.show(block=False)
         plt.pause(3)
         plt.close()
@@ -49,33 +49,37 @@ def main():
     print("folding ratio is: ",cal_folding(N,Lx,Ly))
     print("Pe value is: ",Pe)
 
-    grid = grid_seperation(grid, posx, posy, M, Lx, Ly)
+    grid = grid_seperation(grid, qx, qy, M, Lx, Ly)
     # Run
-    set_seed(714)
     for _ in range(epoch):
+        set_seed(savepoint+_)
         t1 = time()
-        posx, posy, vecx, vecy, theta=run(step, grid, posx, posy, vecx, vecy, theta, Pe, N, M, Lx, Ly)
-        if _%5==0:
-            grid = grid_seperation(grid, posx, posy, M, Lx, Ly)
+        qx, qy, px, py, theta=run(step, grid, qx, qy, px, py, theta, Pe, N, M, Lx, Ly)
+        if _%10==0:
+            grid = grid_seperation(grid, qx, qy, M, Lx, Ly)
         t2 = time()
 
         if _%100==0 or _<200:
             print("iteration: ", _, "time: ", t2-t1)
 
-        if is_save and (_ % 100==0):
-            data = {'px': posx,
-                    'py': posy,
-                    'vx': vecx,
-                    'vy': vecy,
-                    'theta': theta
+        if is_save and ((_ % 1000==0)
+                        # or (_>1000 and _%5==0)
+                        # or (_>800)
+        ):
+            data = {'qx': qx,
+                    'qy': qy,
+                    'px': px,
+                    'py': py,
+                    'theta': theta,
+                    # 'grid':np.ndarray(grid)
                     }
-            save("./results/state"+str(savepoint+_)+".npz", data)
-        if is_show and (_ % 100==0):
-            display(posx, posy)
+            save("./results/"+str(savepoint+_)+".npz", data)
+        if is_show and (_ % 1000==0):
+            display(qx, qy)
             plt.show(block=False)
             plt.pause(3)
             plt.close()
-    return posx, posy
+    return qx, qy
 
 if __name__== "__main__":
     # import pdb
@@ -83,4 +87,5 @@ if __name__== "__main__":
     #     main()
     # except Exception as e:
     #     pdb.set_trace()
+
     main()
