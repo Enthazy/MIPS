@@ -12,7 +12,7 @@ def main():
         return qx, qy, px, py, theta
 
     # Hyper-parameters
-    epoch = int(2e5)
+    epoch = int(3e3)
 
     N = 10000  # number of particles
     M = 60
@@ -20,8 +20,8 @@ def main():
     Ly = 120 # box size y
     step = 5e-6
     Pe = 120 #Peclet number
-    is_save = True
-    is_load = True
+    is_save = False
+    is_load = False
     is_show = False
     savepoint=0
     np.random.seed(714)
@@ -87,5 +87,7 @@ if __name__== "__main__":
     #     main()
     # except Exception as e:
     #     pdb.set_trace()
-
+    T1 = time()
     main()
+    T2 = time()
+    print("time: ", T2-T1)

@@ -2,85 +2,76 @@ from src import *
 
 def main():
     def init(N):
-        coords = generate_points_with_min_distance(n=N, shape=(Lx*0.98, Ly*0.98), min_dist=2)
-        posx = np.array(coords[:,0])
-        posy = np.array(coords[:,1])
-        theta = np.random.randn(N)
+        coords = generate_points_with_min_distance(n=N, shape=(Lx*0.98, Ly*0.98), min_dist=1)
+        qx = np.array(coords[:,0]).astype(np.float32)
+        qy = np.array(coords[:,1]).astype(np.float32)
+        theta = np.random.randn(N).astype(np.float32)
 
-        vecx = np.zeros(N)
-        vecy = np.zeros(N)
-        return posx, posy, vecx, vecy, theta
+        px = np.zeros(N).astype(np.float32)
+        py = np.zeros(N).astype(np.float32)
+        return qx, qy, px, py, theta
 
     # Hyper-parameters
-    epoch = int(1e4)
+    epoch = int(3e3)
 
-    N = 15625  # number of particles
-    M = 70
-    Lx = 260 # box size x
-    Ly = 260 # box size y
+    N = 4900  # number of particles
+    M = 60
+    Lx = 120 # box size x
+    Ly = 120 # box size y
     step = 5e-6
-    Pe = 100 #Peclet number
-    is_save = True
+    Pe = 120 #Peclet number
+    is_save = False
     is_load = False
-    is_show = False
     savepoint=0
+    np.random.seed(714)
 
     # Initialization ===============================================
-    posx, posy, vecx, vecy, theta = init(N)
-    print(posx.shape)
+    qx, qy, px, py, theta = init(N)
     grid = grid_init(M)
 
     if is_load:
-        savepoint = 4600
-        data = load("./results/state"+str(savepoint)+".npz")
-        posx = data['px']
-        posy = data['py']
-        vecx = data['vx']
-        vecy = data['vy']
+        savepoint = "50_0.684"
+        data = load("./results/"+str(savepoint)+".npz")
+        qx = data['qx']
+        qy = data['qy']
+        px = data['px']
+        py = data['py']
         theta = data['theta']
         print("=========Load savepoint successfully=========")
-    if is_show:
-        display(posx, posy)
-        plt.show(block=False)
-        plt.pause(3)
-        plt.close()
 
     # Calculate physical quantities
-    print("folding ratio is: ",cal_folding(N,Lx,Ly))
+    folding_frac = round(cal_folding(N,Lx,Ly),3)
+    print("folding ratio is: ",folding_frac)
     print("Pe value is: ",Pe)
 
-    grid = grid_seperation(grid, posx, posy, M, Lx, Ly)
+    grid = grid_seperation(grid, qx, qy, M, Lx, Ly)
     # Run
-    set_seed(714)
-    for _ in range(epoch):
-        t1 = time()
-        posx, posy, vecx, vecy, theta=run(step, grid, posx, posy, vecx, vecy, theta, Pe, N, M, Lx, Ly)
-        if _%5==0:
-            grid = grid_seperation(grid, posx, posy, M, Lx, Ly)
-        t2 = time()
 
-        if _%100==0 or _<200:
-            print("iteration: ", _, "time: ", t2-t1)
+    @njit()
+    def body(grid, qx, qy, px, py, theta):
+        for _ in range(epoch):
+            set_seed(_)
+            qx, qy, px, py, theta = run(step, grid, qx, qy, px, py, theta, Pe, N, M, Lx, Ly)
+            if _%50==0:
+                grid = grid_seperation(grid, qx, qy, M, Lx, Ly)
+        return qx, qy, px, py, theta
 
-        if is_save and (_ % 100==0):
-            data = {'px': posx,
-                    'py': posy,
-                    'vx': vecx,
-                    'vy': vecy,
-                    'theta': theta
-                    }
-            save("./results/state"+str(savepoint+_)+".npz", data)
-        if is_show and (_ % 100==0):
-            display(posx, posy)
-            plt.show(block=False)
-            plt.pause(3)
-            plt.close()
-    return posx, posy
+    qx, qy, px, py, theta = body(grid, qx, qy, px, py, theta)
+
+    if is_save:
+        data = {'qx': qx,
+                'qy': qy,
+                'px': px,
+                'py': py,
+                'theta': theta,
+                }
+        save("./results/"+str(Pe)+"_"+str(folding_frac)+".npz", data)
+
+    return qx, qy
 
 if __name__== "__main__":
-    # import pdb
-    # try:
-    #     main()
-    # except Exception as e:
-    #     pdb.set_trace()
+    import sys
+    t1 = time()
     main()
+    t2 = time()
+    print("running time: ", t2-t1)
