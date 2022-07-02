@@ -1,16 +1,6 @@
 from src import *
 
 def main():
-    def init(N):
-        coords = generate_points_with_min_distance(n=N, shape=(Lx*0.98, Ly*0.98), min_dist=1)
-        qx = np.array(coords[:,0]).astype(np.float32)
-        qy = np.array(coords[:,1]).astype(np.float32)
-        theta = np.random.randn(N).astype(np.float32)
-
-        px = np.zeros(N).astype(np.float32)
-        py = np.zeros(N).astype(np.float32)
-        return qx, qy, px, py, theta
-
     # Hyper-parameters
     epoch = int(3e3)
 
@@ -26,6 +16,16 @@ def main():
     np.random.seed(714)
 
     # Initialization ===============================================
+    def init(N):
+        coords = generate_points_with_min_distance(n=N, shape=(Lx*0.98, Ly*0.98), min_dist=1)
+        qx = np.array(coords[:,0]).astype(np.float32)
+        qy = np.array(coords[:,1]).astype(np.float32)
+        theta = np.random.randn(N).astype(np.float32)
+
+        px = np.zeros(N).astype(np.float32)
+        py = np.zeros(N).astype(np.float32)
+        return qx, qy, px, py, theta
+
     qx, qy, px, py, theta = init(N)
     grid = grid_init(M)
 
