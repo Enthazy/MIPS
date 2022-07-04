@@ -3,7 +3,6 @@
 #PBS -m abe
 #PBS -q standard
 
-cd $HOME/MIPS/scripts
+cd $HOME/MIPS/v1.0
 
-### SAR OTAR Lattice(S/R) rho, trigShape
 python3 main_lite.py

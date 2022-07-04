@@ -82,7 +82,4 @@ def main():
 
 if __name__== "__main__":
     import sys
-    t1 = time()
     main()
-    t2 = time()
-    print("running time: ", t2-t1)
