@@ -2,7 +2,7 @@
 #PBS -N over_damped_single
 #PBS -m a
 #PBS -q standard
-#PBS -k o
+#PBS -k oe
 
 cd $HOME/MIPS/v1.0
 # number of output data
