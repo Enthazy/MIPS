@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import figure
 import math
-from time import time
 
 from numba import jit, njit, prange
 from numba.typed import List
