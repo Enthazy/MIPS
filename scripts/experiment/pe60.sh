@@ -13,4 +13,5 @@ cd $HOME/MIPS/v1.0
 # simulation size
 # value of Peclet number
 echo $PBS_ARRYID
+echo 60
 python3 main.py 800 1000 4900 20 $((75 + (5 * $PBS_ARRAYID))) 60
