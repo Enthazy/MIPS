@@ -1,8 +1,9 @@
 #!/bin/bash
-#PBS -N over_damped_single
+#PBS -N od_multi
 #PBS -m a
-#PBS -q standard
+#PBS -q parallel8
 #PBS -k o
+#PBS -t 0-5
 
 cd $HOME/MIPS/v1.0
 # number of output data
@@ -11,4 +12,5 @@ cd $HOME/MIPS/v1.0
 # number of grids
 # simulation size
 # value of Peclet number
-python3 main.py 1000 1000 4900 20 80 120
+echo $PBS_ARRYID
+python3 main.py 10 1000 4900 $((10 + (5 * $PBS_ARRAYID))) 80 120
