@@ -1,5 +1,5 @@
 #!/bin/bash
-#PBS -N over_damped_single
+#PBS -N moduletest
 #PBS -m a
 #PBS -q standard
 #PBS -k oe
