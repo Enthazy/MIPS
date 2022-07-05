@@ -10,8 +10,8 @@ def main():
 
     N = 4900  # number of particles
     M = 20  # number of grids
-    Lx = 120  # box size x
-    Ly = 120  # box size y
+    Lx = 80  # box size x
+    Ly = Lx  # box size y
     step = 5e-6
     Pe = 120  # Peclet number
     is_save = True
