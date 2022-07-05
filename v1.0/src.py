@@ -149,7 +149,7 @@ def p_updater(grid, qx, qy, px, py,
 def grid_init(M):
     grid = List()
     for i in range(M*M):
-        grid.append(List(np.zeros(1).astype(np.int64)))
+        grid.append(List(np.zeros(1).astype(np.int32)))
     return grid
 
 @jit(nopython=NOPYTHON)
@@ -184,19 +184,19 @@ def grid_seperation(grid, qx, qy, M, Lx, Ly):
     '''
     M = int(M)
     N = len(qx)
-    idx = (qx // (Lx/M)).astype(np.int64)
-    idy = (qy // (Ly/M)).astype(np.int64)
+    idx = (qx // (Lx/M)).astype(np.int32)
+    idy = (qy // (Ly/M)).astype(np.int32)
     # idx = np.array([M+x if x<0 else x for x in idx])
     # idy = np.array([M+x if x<0 else x for x in idy])
-    lst = [[0] for _ in range(M**2)]
+    lst = [[np.int32(0)] for _ in range(M**2)]
     for i in range(N):
         tempy = idy[i]
         tempx = idx[i]
         # there are M+1 edges but only M grids
         if tempy == M: tempy=0
         if tempx == M: tempx=0
-        t = np.int64(tempx + tempy*M)
-        lst[t].append(np.int64(i))
+        t = np.int32(tempx + tempy*M)
+        lst[t].append(np.int32(i))
     for i in range(M**2):
         grid[i] = List(lst[i])
     return grid
@@ -236,11 +236,13 @@ def updater(step, grid, qx, qy, px, py, theta, s_x, s_y, s_theta, Pe, M, Lx, Ly)
 
 
 @jit(nopython=NOPYTHON)
-def run(step, grid, qx, qy, px, py, theta, Pe, N, M, Lx, Ly):
+def run(step, grid, qx, qy, px, py, theta,
+        s_x, s_y, s_theta,
+        Pe, N, M, Lx, Ly):
     # generate random variable
-    s_x = np.random.randn(N)
-    s_y = np.random.randn(N)
-    s_theta = np.random.randn(N)
+    # s_x = np.random.randn(N)
+    # s_y = np.random.randn(N)
+    # s_theta = np.random.randn(N)
 
     # update the position q and velocity p
     updater(step, grid, qx, qy, px, py, theta, s_x, s_y, s_theta, Pe, M, Lx, Ly)
@@ -248,5 +250,5 @@ def run(step, grid, qx, qy, px, py, theta, Pe, N, M, Lx, Ly):
     # fold back the periodic points
     qx = np.remainder(qx, Lx).astype(np.float32)
     qy = np.remainder(qy, Ly).astype(np.float32)
-    theta = np.remainder(theta, 2 * np.pi).astype(np.float32)
+    theta = np.remainder(theta, 2 * np.float32(np.pi)).astype(np.float32)
     return qx, qy, px, py, theta
