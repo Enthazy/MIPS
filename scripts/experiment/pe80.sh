@@ -1,7 +1,7 @@
 #!/bin/bash
 #PBS -N od_multi
 #PBS -m a
-#PBS -q parallel16
+#PBS -q parallel32
 #PBS -k o
 #PBS -t 0-9
 

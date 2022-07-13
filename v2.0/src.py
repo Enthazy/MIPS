@@ -1,3 +1,4 @@
+import numpy as np
 from numba.typed import List
 from numba import jit, prange
 from utils import *
@@ -9,136 +10,6 @@ sqrt2 = np.sqrt(2)
 root32 = 2 ** (1 / 3)
 root62 = 2 ** (1 / 6)
 root62n = -1 * 2 ** (1 / 6)
-
-
-@jit(nopython=NOPYTHON)
-def gradient_reduced_LJPotential(x, y, d2):
-    """
-        calculat the gradient of the FJ potential
-        Notice that the Potential is zero for d > 2^1/6 ~ 1.12
-        gradient is 24((1/r^6)-2(1/r^12))
-    :param x: difference on x between two points
-    :param y: difference on y between two points
-    :param d2: squared distance d2 = x^2 + y^2
-    :return: the gradient ptor dx, dy
-    """
-    rx = x / d2  # direction x
-    ry = y / d2  # direction y
-    k = (1 / d2) ** 3
-    s = 24 * (k - 2 * k ** 2)  # strength
-    return s * rx, s * ry
-
-
-@jit(nopython=NOPYTHON, parallel=True)
-def p_updater(grid, qx, qy, px, py,
-              M, Lx, Ly):
-    """
-        Calculate the velocity of particles
-
-    :param grid: list[int], contains the indices of particles in the grids
-    :param qx: list[float], x qition of particles
-    :param qy: list[float], y qition of particles
-    :param px: list[float], x velocity of particles
-    :param py: list[float], y velocity of particles
-    :param M: M**2 is the number of grids
-    :param Lx: the size of the box in x
-    :param Ly: the size of the box in y
-    :return: the velocity ptors
-    """
-    # ================================================
-    # 1. get info for the current grid, find neighbour grid
-    # ================================================
-    for idx_grid in prange(len(grid)):
-        # 1.1 get the points in the current grid
-        points = grid[idx_grid]  # list[int] of indices of particles
-
-        # 1.2 the grid location
-        indx = idx_grid % M
-        indy = idx_grid // M
-
-        # 1.3 Check if the grid is near boundary
-        is_bdy = indx == 0 or indx == M - 1 or indy == 0 or indy == M - 1
-
-        # 1.4 get the points in the neighbour grid
-        neighbour_points = get_cal_range(grid, indx, indy, M)
-
-        # ================================================
-        # 2. For each point p in the grid, calculate the interaction between
-        # ================================================
-        for idx_i in prange(len(points)):
-
-            i = points[idx_i]  # first particle
-
-            # ======================================================
-            # 3. Collide Detection in the current grid
-            # ======================================================
-            for idx_j in prange(len(points) - idx_i - 1):
-                j = points[len(points) - idx_j - 1]  # second particle
-                if i == j: continue
-
-                x1 = qx[i]
-                x2 = qx[j]
-
-                if is_bdy:  # Boundary effect
-                    if x2 > x1 + Lx / 2: x2 = x2 - Lx
-                    if x1 > x2 + Lx / 2: x1 = x1 - Lx
-                x_diff = x1 - x2
-
-                if root62n < x_diff < root62:  # close enough in x direction
-
-                    y1 = qy[i]
-                    y2 = qy[j]
-                    if is_bdy:  # Boundary effect
-                        if y2 > y1 + Ly / 2: y2 = y2 - Ly
-                        if y1 > y2 + Ly / 2: y1 = y1 - Ly
-                    y_diff = y1 - y2
-                    if root62n < y_diff < root62:  # close enough in y direction
-
-                        d2 = x_diff ** 2 + y_diff ** 2
-                        if d2 < root32:  # distance smaller than 2^1/3
-                            # =========================================================
-                            # Calculate the interaction
-                            # =========================================================
-                            vpx, vpy = gradient_reduced_LJPotential(x_diff, y_diff, d2)
-                            px[i] -= vpx
-                            py[i] -= vpy
-                            px[j] += vpx
-                            py[j] += vpy
-
-            # ======================================================
-            # 4. Collide Detection in the neighbour grid
-            # ======================================================
-            for idx_j in prange(len(neighbour_points)):
-                j = neighbour_points[idx_j]  # second particle
-                if i == j: continue
-
-                x1 = qx[i]
-                x2 = qx[j]
-                if is_bdy:  # Boundary effect
-                    if x2 > x1 + Lx / 2: x2 = x2 - Lx
-                    if x1 > x2 + Lx / 2: x1 = x1 - Lx
-                x_diff = x1 - x2
-                if root62n < x_diff < root62:  # close enough in x direction
-
-                    y1 = qy[i]
-                    y2 = qy[j]
-                    if is_bdy:  # Boundary effect
-                        if y2 > y1 + Ly / 2: y2 = y2 - Ly
-                        if y1 > y2 + Ly / 2: y1 = y1 - Ly
-                    y_diff = y1 - y2
-                    if root62n < y_diff < root62:  # close enough in y direction
-
-                        d2 = x_diff ** 2 + y_diff ** 2
-                        if d2 < root32:  # distance smaller than 2^1/3
-                            # =========================================================
-                            # Calculate the interaction
-                            # =========================================================
-                            vpx, vpy = gradient_reduced_LJPotential(x_diff, y_diff, d2)
-                            # assert vpx < 1e6 and vpy < 1e6
-                            px[i] -= vpx
-                            py[i] -= vpy
-                            px[j] += vpx
-                            py[j] += vpy
 
 
 def grid_init(M):
@@ -200,7 +71,140 @@ def grid_seperation(grid, qx, qy, M, Lx, Ly):
 
 
 @jit(nopython=NOPYTHON)
-def dynamics(grid, qx, qy, px, py, theta, Pe, M, Lx, Ly):
+def gradient_reduced_LJPotential(x, y, d2):
+    """
+        calculat the gradient of the FJ potential
+        Notice that the Potential is zero for d > 2^1/6 ~ 1.12
+        gradient is 24((1/r^6)-2(1/r^12))
+    :param x: difference on x between two points
+    :param y: difference on y between two points
+    :param d2: squared distance d2 = x^2 + y^2
+    :return: the gradient ptor dx, dy
+    """
+    rx = x / d2  # direction x
+    ry = y / d2  # direction y
+    k = (1 / d2) ** 3
+    s = 24 * (k - 2 * k ** 2)  # strength
+    return s * rx, s * ry
+
+
+@jit(nopython=NOPYTHON, parallel=True)
+def interaction_calculator(dpx, dpy,
+                           grid, qx, qy,
+                           M, Lx, Ly):
+    """
+        Calculate the interactions under LJ-potential
+        output the velocity gradients dpx, dpy
+
+    :param grid: list[int], contains the indices of particles in the grids
+    :param qx: list[float], x qition of particles
+    :param qy: list[float], y qition of particles
+    :param dpx: list[float], x velocity of particles
+    :param dpy: list[float], y velocity of particles
+    :param M: M**2 is the number of grids
+    :param Lx: the size of the box in x
+    :param Ly: the size of the box in y
+    :return: the velocity ptors
+    """
+    # ================================================
+    # 1. get info for the current grid, find neighbour grid
+    # ================================================
+    for idx_grid in prange(len(grid)):
+        # 1.1 get the points in the current grid
+        points = grid[idx_grid]  # list[int] of indices of particles
+
+        # 1.2 the grid location
+        indx = idx_grid % M
+        indy = idx_grid // M
+
+        # 1.3 Check if the grid is near boundary
+        is_bdy = indx == 0 or indx == M - 1 or indy == 0 or indy == M - 1
+
+        # 1.4 get the points in the neighbour grid
+        neighbour_points = get_cal_range(grid, indx, indy, M)
+
+        # ================================================
+        # 2. For each point p in the grid, calculate the interaction between
+        # ================================================
+        for idx_i in prange(len(points)):
+
+            i = points[idx_i]  # first particle
+
+            # ======================================================
+            # 3. Collide Detection in the current grid
+            # ======================================================
+            for idx_j in prange(len(points) - idx_i - 1):
+                j = points[len(points) - idx_j - 1]  # second particle
+                if i == j: continue
+
+                x1 = qx[i]
+                x2 = qx[j]
+
+                if is_bdy:  # Boundary effect
+                    if x2 > x1 + Lx / 2: x2 = x2 - Lx
+                    if x1 > x2 + Lx / 2: x1 = x1 - Lx
+                x_diff = x1 - x2
+
+                if root62n < x_diff < root62:  # close enough in x direction
+
+                    y1 = qy[i]
+                    y2 = qy[j]
+                    if is_bdy:  # Boundary effect
+                        if y2 > y1 + Ly / 2: y2 = y2 - Ly
+                        if y1 > y2 + Ly / 2: y1 = y1 - Ly
+                    y_diff = y1 - y2
+                    if root62n < y_diff < root62:  # close enough in y direction
+
+                        d2 = x_diff ** 2 + y_diff ** 2
+                        if d2 < root32:  # distance smaller than 2^1/3
+                            # =========================================================
+                            # Calculate the interaction
+                            # =========================================================
+                            vpx, vpy = gradient_reduced_LJPotential(x_diff, y_diff, d2)
+                            dpx[i] -= vpx
+                            dpy[i] -= vpy
+                            dpx[j] += vpx
+                            dpy[j] += vpy
+
+            # ======================================================
+            # 4. Collide Detection in the neighbour grid
+            # ======================================================
+            for idx_j in prange(len(neighbour_points)):
+                j = neighbour_points[idx_j]  # second particle
+                if i == j: continue
+
+                x1 = qx[i]
+                x2 = qx[j]
+                if is_bdy:  # Boundary effect
+                    if x2 > x1 + Lx / 2: x2 = x2 - Lx
+                    if x1 > x2 + Lx / 2: x1 = x1 - Lx
+                x_diff = x1 - x2
+                if root62n < x_diff < root62:  # close enough in x direction
+
+                    y1 = qy[i]
+                    y2 = qy[j]
+                    if is_bdy:  # Boundary effect
+                        if y2 > y1 + Ly / 2: y2 = y2 - Ly
+                        if y1 > y2 + Ly / 2: y1 = y1 - Ly
+                    y_diff = y1 - y2
+                    if root62n < y_diff < root62:  # close enough in y direction
+
+                        d2 = x_diff ** 2 + y_diff ** 2
+                        if d2 < root32:  # distance smaller than 2^1/3
+                            # =========================================================
+                            # Calculate the interaction
+                            # =========================================================
+                            vpx, vpy = gradient_reduced_LJPotential(x_diff, y_diff, d2)
+                            dpx[i] -= vpx
+                            dpy[i] -= vpy
+                            dpx[j] += vpx
+                            dpy[j] += vpy
+
+
+@jit(nopython=NOPYTHON)
+def p_gradient_calculator(grid, qx, qy, qtheta,
+                          px, py,
+                          Pe, M, Lx, Ly):
     """
         Calculate the velocity of the particles under
         1.  LJ-Potential
@@ -208,43 +212,100 @@ def dynamics(grid, qx, qy, px, py, theta, Pe, M, Lx, Ly):
 
     :return:
     """
-    p_updater(grid, qx, qy, px, py, M, Lx, Ly)
-    px += Pe * np.cos(theta)
-    py += Pe * np.sin(theta)
-    return px, py
+
+    # initial a gradient vector
+    dpx = np.zeros_like(px)
+    dpy = np.zeros_like(py)
+
+    interaction_calculator(dpx, dpy, grid, qx, qy, M, Lx, Ly)
+    dpx += Pe * np.cos(qtheta)
+    dpy += Pe * np.sin(qtheta)
+
+    return dpx, dpy
 
 
 @jit(nopython=NOPYTHON)
-def updater(step, grid, qx, qy, px, py, theta, s_x, s_y, s_theta, Pe, M, Lx, Ly):
+def p_updater(dpx, dpy,
+              px, py, ptheta,
+              s_x, s_y, s_theta,
+              step, W):
+    """
+        Calculate the velocity of the particles under
+        1.  LJ-Potential
+        2.  Self-Proportional force
+
+    :return:
+    """
+    sqrt_step = np.sqrt(step)
+
+    px += (step * dpx + sqrt2 * sqrt_step * s_x) / W
+    py += (step * dpy + sqrt2 * sqrt_step * s_y) / W
+    ptheta += sqrt6 * sqrt_step * s_theta / (3*W/8)
+    return px, py, ptheta
+
+
+@jit(nopython=NOPYTHON)
+def q_gradient_calculator(px, py, ptheta):
+    """
+        Update the position and velocity
+        Update the Stochastic Brownian motion
+
+    :return:
+    """
+    dqx = px
+    dqy = py
+    dqtheta = ptheta
+    return dqx, dqy, dqtheta
+
+
+@jit(nopython=NOPYTHON)
+def q_updater(step, qx, qy, qtheta,
+              dqx, dqy, dqtheta
+              ):
     """
         Update the position and velocity
         Update the Stochastic Brownian motion
     :return:
     """
-    sqrt_step = np.sqrt(step)
-    # Over-damping
-    px.fill(0)
-    py.fill(0)
 
-    dx, dy = dynamics(grid, qx, qy, px, py, theta, Pe, M, Lx, Ly)
-
-    qx += step * dx + sqrt2 * sqrt_step * s_x
-    qy += step * dy + sqrt2 * sqrt_step * s_y
-    theta += sqrt6 * sqrt_step * s_theta
+    qx += step * dqx
+    qy += step * dqy
+    qtheta += step * dqtheta
 
 
 @jit(nopython=NOPYTHON)
-def run(step, grid, qx, qy, px, py, theta, Pe, N, M, Lx, Ly):
-    # generate random variable
-    s_x = np.random.randn(N)
-    s_y = np.random.randn(N)
-    s_theta = np.random.randn(N)
+def updater(step, grid, qx, qy, qtheta, px, py, ptheta,
+            s_x, s_y, s_theta,
+            Pe, W, M, Lx, Ly):
 
-    # update the position q and velocity p
-    updater(step, grid, qx, qy, px, py, theta, s_x, s_y, s_theta, Pe, M, Lx, Ly)
+    # Calculate dq, dp
+    dpx, dpy = p_gradient_calculator(grid, qx, qy, qtheta,
+                                              px, py,
+                                              Pe, M, Lx, Ly)
+
+    # dqx, dqy, dqtheta = q_gradient_calculator()
+
+    # Update q, p
+    p_updater(dpx, dpy,
+              px, py, ptheta,
+              s_x, s_y, s_theta,
+              step, W)
+
+    q_updater(step, qx, qy, qtheta,
+              px, py, ptheta)
+
+
+@jit(nopython=NOPYTHON)
+def run(step, grid, qx, qy, qtheta, px, py, ptheta,
+        s_x, s_y, s_theta,
+        Pe, W, M, Lx, Ly):
+
+    updater(step, grid, qx, qy, qtheta, px, py, ptheta,
+            s_x, s_y, s_theta,
+            Pe, W, M, Lx, Ly)
 
     # fold back the periodic points
     qx = np.remainder(qx, Lx).astype(np.float32)
     qy = np.remainder(qy, Ly).astype(np.float32)
-    theta = np.remainder(theta, 2 * np.pi).astype(np.float32)
-    return qx, qy, px, py, theta
+    qtheta = np.remainder(qtheta, 2 * np.float32(np.pi)).astype(np.float32)
+    return qx, qy, qtheta, px, py, ptheta
