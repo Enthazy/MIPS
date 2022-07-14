@@ -2,7 +2,7 @@
 #PBS -N under_single
 #PBS -m a
 #PBS -q parallel16
-#PBS -k o
+#PBS -k oe
 
 cd $HOME/MIPS/v2.0
 # number of output data
