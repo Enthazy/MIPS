@@ -1,7 +1,7 @@
 #!/bin/bash
 #PBS -N under_single
 #PBS -m a
-#PBS -q standard
+#PBS -q parallel16
 #PBS -k o
 
 cd $HOME/MIPS/v2.0
