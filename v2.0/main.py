@@ -11,11 +11,11 @@ def main():
 
     N = np.int32(sys.argv[3])  # number of particles
     M = np.int32(sys.argv[4])  # number of grids
-    step = np.float32(sys.argv[5] * 1e-8) # time step
+    step = np.float32(float(sys.argv[5]) * 1e-8) # time step
     Lx = np.int32(sys.argv[6])  # box size x
     Ly = np.int32(sys.argv[6])  # box size y
     Pe = np.int32(sys.argv[7])  # Peclet number
-    W = np.int32(sys.argv[8] * 1e-3)   # W number
+    W = np.int32(int(sys.argv[8]) * 1e-3)   # W number
     is_save = True
     is_load = False
     savepoint = 0
