@@ -4,7 +4,7 @@
 #PBS -q standard
 #PBS -k o
 
-cd $HOME/MIPS/v1.0
+cd $HOME/MIPS/v2.0
 # number of output data
 # number of iteration in each data
 # number of particles
