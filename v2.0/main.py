@@ -11,11 +11,11 @@ def main():
 
     N = np.int32(sys.argv[3])  # number of particles
     M = np.int32(sys.argv[4])  # number of grids
-    Lx = np.int32(sys.argv[5])  # box size x
-    Ly = np.int32(sys.argv[5])  # box size y
-    step = np.float32(5e-6)
-    Pe = np.int32(sys.argv[6])  # Peclet number
-    W = np.int32(sys.argv[7])   # W number
+    step = np.float32(sys.argv[5] * 1e-8) # time step
+    Lx = np.int32(sys.argv[6])  # box size x
+    Ly = np.int32(sys.argv[6])  # box size y
+    Pe = np.int32(sys.argv[7])  # Peclet number
+    W = np.int32(sys.argv[8] * 1e-3)   # W number
     is_save = True
     is_load = False
     savepoint = 0
@@ -26,13 +26,14 @@ def main():
         coords = generate_points_with_min_distance(n=N, shape=(Lx * 0.98, Ly * 0.98), min_dist=1)
         qx = np.array(coords[:, 0]).astype(np.float32)
         qy = np.array(coords[:, 1]).astype(np.float32)
-        theta = np.random.randn(N).astype(np.float32)
+        qtheta = np.random.randn(N).astype(np.float32)
 
         px = np.zeros(N).astype(np.float32)
         py = np.zeros(N).astype(np.float32)
-        return qx, qy, px, py, theta
+        ptheta = np.zeros(N).astype(np.float32)
+        return qx, qy, qtheta, px, py, ptheta
 
-    qx, qy, px, py, theta = init(N)
+    qx, qy, qtheta, px, py, ptheta = init(N)
     grid = grid_init(M)
 
     if is_load:
@@ -42,7 +43,7 @@ def main():
         qy = data['qy']
         px = data['px']
         py = data['py']
-        theta = data['theta']
+        qtheta = data['qtheta']
         print("=========Load savepoint successfully=========")
 
     # Calculate physical quantities
@@ -59,7 +60,7 @@ def main():
     # Run
 
     @njit()
-    def body(grid, qx, qy, px, py, theta, random_pool):
+    def body(grid, qx, qy, qtheta, px, py, ptheta, random_pool):
         for _ in range(savetime):
             # get random variables
             _N = _*3*N
@@ -67,19 +68,20 @@ def main():
             s_y = random_pool[_N+N:_N+2*N]
             s_theta = random_pool[_N+2*N:_N+3*N]
 
-            qx, qy, px, py, theta = run(step, grid, qx, qy, px, py, theta,
-                                        s_x, s_y, s_theta,
-                                        Pe, W, M, Lx, Ly)
+            qx, qy, qtheta, px, py, ptheta = run(step, grid, qx, qy, qtheta, px, py, ptheta,
+                                                 s_x, s_y, s_theta,
+                                                 Pe, W, M, Lx, Ly)
+
             if _ % grid_update_time == 0:
                 grid = grid_seperation(grid, qx, qy, M, Lx, Ly)
-        return qx, qy, px, py, theta
+        return qx, qy, qtheta, px, py, ptheta
 
 
     # Main Loop
     for _e in range(epoch):
         T1 = time()
         random_pool = rng.standard_normal(3*N*savetime, dtype=np.float32)
-        qx, qy, px, py, theta = body(grid, qx, qy, px, py, theta, random_pool)
+        qx, qy, qtheta, px, py, ptheta = body(grid, qx, qy, qtheta, px, py, ptheta, random_pool)
         T2 = time()
         print("time: ", T2-T1)
         if is_save:
@@ -91,9 +93,10 @@ def main():
 
                     'qx': qx,
                     'qy': qy,
+                    'qtheta': qtheta,
                     'px': px,
                     'py': py,
-                    'theta': theta,
+                    'ptheta': ptheta,
                     }
             save("./results/" + str(Pe) + "_" + str(folding_frac) + "/" + str(_e) + ".npz", data)
 
