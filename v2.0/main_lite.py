@@ -3,18 +3,18 @@ from time import time
 
 def main():
     # Hyper-parameters
-    epoch = int(1e3)  # how many savesfile will be generated
-    savetime = int(1e3)  # iterations in each epoch
+    epoch = int(1e2)  # how many savesfile will be generated
+    savetime = int(1e2)  # iterations in each epoch
     # how many iterations for each savefile
-    grid_update_time = int(50)  # how many iterations for each grid update
+    grid_update_time = int(1)  # how many iterations for each grid update
 
     N = 10000  # number of particles
     M = 20  # number of grids
+    step = 1e-6
     Lx = 120  # box size x
     Ly = Lx  # box size y
-    step = 5e-6
     Pe = 120  # Peclet number
-    W = 0.05   # W number
+    W = 0.1   # W number
     is_save = True
     is_load = False
     savepoint = 0

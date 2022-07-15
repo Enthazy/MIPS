@@ -7,7 +7,7 @@ def main():
     epoch = np.int32(sys.argv[1])  # how many savesfile will be generated
     savetime = np.int32(sys.argv[2])  # iterations in each epoch
     # how many iterations for each savefile
-    grid_update_time = int(10)  # how many iterations for each grid update
+    grid_update_time = int(1)  # how many iterations for each grid update
 
     N = np.int32(sys.argv[3])  # number of particles
     M = np.int32(sys.argv[4])  # number of grids
@@ -15,7 +15,7 @@ def main():
     Lx = np.int32(sys.argv[6])  # box size x
     Ly = np.int32(sys.argv[6])  # box size y
     Pe = np.int32(sys.argv[7])  # Peclet number
-    W = np.int32(int(sys.argv[8]) * 1e-3)   # W number
+    W = np.float32(int(sys.argv[8]) * 1e-3)   # W number
     is_save = True
     is_load = False
     savepoint = 0
@@ -50,6 +50,7 @@ def main():
     folding_frac = round(cal_folding(N, Lx, Ly), 3)
     print("folding ratio is: ", folding_frac)
     print("Pe value is: ", Pe)
+    print("W value is: ", W)
     import os
     os.makedirs("./results/" + str(Pe) + "_" + str(folding_frac), exist_ok=True)
 
