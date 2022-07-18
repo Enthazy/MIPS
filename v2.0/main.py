@@ -47,12 +47,12 @@ def main():
         print("=========Load savepoint successfully=========")
 
     # Calculate physical quantities
-    folding_frac = round(cal_folding(N, Lx, Ly), 3)
+    folding_frac = round(cal_folding(N, Lx, Ly), 2)*100
     print("folding ratio is: ", folding_frac)
     print("Pe value is: ", Pe)
     print("W value is: ", W)
     import os
-    os.makedirs("./results/" + str(Pe) + "_" + str(folding_frac), exist_ok=True)
+    os.makedirs("./results/" + "F"+str(folding_frac) + "P"+str(Pe) + "W" + str(int(W*100)), exist_ok=True)
 
     grid = grid_seperation(grid, qx, qy, M, Lx, Ly)
 

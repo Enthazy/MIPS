@@ -16,11 +16,11 @@ def load_points(savepoint):
     data = load("./results/" + str(savepoint) + ".npz")
     qx = data['qx']
     qy = data['qy']
-    Lx = data['L']
-    Ly = data['L']
+    # Lx = data['L']
+    # Ly = data['L']
     print("=========Load savepoint successfully=========")
     points = np.array([[qx[i], y] for i, y in enumerate(qy)])
-    box = (0, Lx, 0, Ly)
+    box = (0, 120, 0, 120)
     return points, box
 
 
@@ -140,12 +140,12 @@ def presenter(savepoint):
     # voronoi_plot(vor)
 
     # generate density histogram
-    # voronoi_histogram(vor)
-    # plt.title("Histogram for epoch "+str(savepoint))
+    voronoi_histogram(vor)
+    plt.title("Histogram for epoch "+str(savepoint))
 
     # generate density histogram for multi epoch
-    voronoi_histogram_multi(savepoint, 3)
-    plt.title("Histogram for multi epoch around "+str(savepoint))
+    # voronoi_histogram_multi(savepoint, 3)
+    # plt.title("Histogram for multi epoch around "+str(savepoint))
 
 
 def main(filename):
@@ -163,5 +163,5 @@ def main(filename):
 
 
 if __name__ == "__main__":
-    main("10.npz")
+    main("999.npz")
     # generate_figure(sys.argv[1])
