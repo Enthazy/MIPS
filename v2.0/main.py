@@ -88,6 +88,7 @@ def main():
         if is_save:
             data = {'epoch': _e,
                     'Pe': Pe,
+                    'W': W,
                     'PackFrac': folding_frac,
                     'N': N,
                     'L': Lx,
@@ -99,7 +100,8 @@ def main():
                     'py': py,
                     'ptheta': ptheta,
                     }
-            save("./results/" + str(Pe) + "_" + str(folding_frac) + "/" + str(_e) + ".npz", data)
+            save("./results/" + "F"+str(folding_frac) + "P"+str(Pe) + "W" + str(int(W*100)) + "/"
+                 + str(_e) + ".npz", data)
 
     return qx, qy
 
