@@ -3,7 +3,7 @@ from time import time
 
 def main():
     # Hyper-parameters
-    epoch = int(1e2)  # how many savesfile will be generated
+    epoch = int(1e1)  # how many savesfile will be generated
     savetime = int(1e2)  # iterations in each epoch
     # how many iterations for each savefile
     grid_update_time = int(1)  # how many iterations for each grid update
@@ -46,11 +46,12 @@ def main():
         print("=========Load savepoint successfully=========")
 
     # Calculate physical quantities
-    folding_frac = round(cal_folding(N, Lx, Ly), 3)
+    folding_frac = int(cal_folding(N, Lx, Ly)*100)
     print("folding ratio is: ", folding_frac)
     print("Pe value is: ", Pe)
     import os
-    os.makedirs("./results/" + str(Pe) + "_" + str(folding_frac), exist_ok=True)
+    os.makedirs('./results/final_states/', exist_ok=True)
+    os.makedirs("./results/" + "F"+str(folding_frac) + "P"+str(Pe) + "W" + str(int(W*1e3)), exist_ok=True)
 
     grid = grid_seperation(grid, qx, qy, M, Lx, Ly)
 
@@ -97,8 +98,9 @@ def main():
                     'py': py,
                     'ptheta': ptheta,
                     }
-            save("./results/" + "F"+str(folding_frac) + "P"+str(Pe) + "W" + str(int(W*100)) + "/"
+            save("./results/" + "F"+str(folding_frac) + "P"+str(Pe) + "W" + str(int(W*1e3)) + "/"
                  + str(_e) + ".npz", data)
+    save("./results/final_states/" + "F"+str(folding_frac) + "P"+str(Pe) + "W" + str(int(W*1e3)) + ".npz", data)
     return qx, qy
 
 if __name__ == "__main__":

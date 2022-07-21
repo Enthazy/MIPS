@@ -1,5 +1,5 @@
 #!/bin/bash
-#PBS -N under_single
+#PBS -N testT
 #PBS -m a
 #PBS -q parallel16
 #PBS -k oe

@@ -1,5 +1,5 @@
 #!/bin/bash
-#PBS -N under_single
+#PBS -N testW
 #PBS -m a
 #PBS -q parallel16
 #PBS -k oe
@@ -15,4 +15,4 @@ cd $HOME/MIPS/v2.0
 # value of Peclet number
 # value of W value 1e-3
 wlst=(1 2 5 10 20 50 100 200 500 1000)
-python3 main.py 1000 500 4900 20 100 80 120 ${wlst[$PBS_ARRAYID]}
+python3 main.py 100000 500 4900 20 100 80 120 ${wlst[$PBS_ARRAYID]}
