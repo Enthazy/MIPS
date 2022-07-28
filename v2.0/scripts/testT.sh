@@ -1,7 +1,7 @@
 #!/bin/bash
 #PBS -N testT
 #PBS -m a
-#PBS -q parallel16
+#PBS -q parallel8
 #PBS -k oe
 #PBS -t 0-6
 
