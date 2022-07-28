@@ -2,6 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.animation import FuncAnimation, PillowWriter
 from numba import njit
+import seaborn as sns
+import pandas as pd
 
 
 @njit()
@@ -20,6 +22,11 @@ def display(posx, posy):
     ax.axis('equal')
     ax.grid()
     # ax.set_axis_off()
+
+def sns_display(posx, posy):
+    data = pd.DataFrame({'px':posx, 'py':posy})
+    sns.scatterplot(x='px',y='py',data=data)
+    plt.grid(alpha=0.5)
 
 
 def circles(x, y, s, c='b', vmin=None, vmax=None, **kwargs):

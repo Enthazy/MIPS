@@ -101,9 +101,19 @@ def main():
                     'py': py,
                     'ptheta': ptheta,
                     }
-            save("./results/" + "F"+str(folding_frac) + "P"+str(Pe) + "W" + str(int(W*1e3)) + "/"
+            save("./results/"
+                 + "F"+str(folding_frac)
+                 + "P"+str(Pe)
+                 + "W" + str(int(W*1e3))
+                 + "T" + str(int(step*1e8))
+                 + "/"
                  + str(_e) + ".npz", data)
-    save("./results/final_states/" + "F"+str(folding_frac) + "P"+str(Pe) + "W" + str(int(W*1e3)) + ".npz", data)
+    save("./results/final_states/"
+         + "F"+str(folding_frac)
+         + "P"+str(Pe)
+         + "W" + str(int(W*1e3))
+         + "T" + str(int(step*1e8))
+         + ".npz", data)
     return qx, qy
 
 if __name__ == "__main__":

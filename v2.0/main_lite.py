@@ -3,18 +3,18 @@ from time import time
 
 def main():
     # Hyper-parameters
-    epoch = int(1e1)  # how many savesfile will be generated
-    savetime = int(1e2)  # iterations in each epoch
+    epoch = int(1e2)  # how many savesfile will be generated
+    savetime = int(1e3)  # iterations in each epoch
     # how many iterations for each savefile
     grid_update_time = int(1)  # how many iterations for each grid update
 
-    N = 10000  # number of particles
+    N = 4900  # number of particles
     M = 20  # number of grids
     step = 1e-6
-    Lx = 120  # box size x
+    Lx = 80  # box size x
     Ly = Lx  # box size y
-    Pe = 120  # Peclet number
-    W = 0.1   # W number
+    Pe = 150  # Peclet number
+    W = 0.01   # W number
     is_save = True
     is_load = False
     savepoint = 0
@@ -87,6 +87,7 @@ def main():
         if is_save:
             data = {'epoch': _e,
                     'Pe': Pe,
+                    'W': W,
                     'PackFrac': folding_frac,
                     'N': N,
                     'L': Lx,
@@ -98,9 +99,19 @@ def main():
                     'py': py,
                     'ptheta': ptheta,
                     }
-            save("./results/" + "F"+str(folding_frac) + "P"+str(Pe) + "W" + str(int(W*1e3)) + "/"
+            save("./results/"
+                 + "F"+str(folding_frac)
+                 + "P"+str(Pe)
+                 + "W" + str(int(W*1e3))
+                 + "T" + str(int(step*1e8))
+                 + "/"
                  + str(_e) + ".npz", data)
-    save("./results/final_states/" + "F"+str(folding_frac) + "P"+str(Pe) + "W" + str(int(W*1e3)) + ".npz", data)
+    save("./results/final_states/"
+         + "F"+str(folding_frac)
+         + "P"+str(Pe)
+         + "W" + str(int(W*1e3))
+         + "T" + str(int(step*1e8))
+         + ".npz", data)
     return qx, qy
 
 if __name__ == "__main__":

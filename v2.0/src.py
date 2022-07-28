@@ -218,8 +218,9 @@ def p_gradient_calculator(grid, qx, qy, qtheta,
     dpy = np.zeros_like(py)
 
     interaction_calculator(dpx, dpy, grid, qx, qy, M, Lx, Ly)
-    dpx += Pe * np.cos(qtheta)
-    dpy += Pe * np.sin(qtheta)
+
+    dpx += Pe * np.cos(qtheta) - px
+    dpy += Pe * np.sin(qtheta) - py
 
     return dpx, dpy
 
@@ -259,9 +260,9 @@ def q_gradient_calculator(px, py, ptheta):
 
 
 @jit(nopython=NOPYTHON)
-def q_updater(step, qx, qy, qtheta,
-              dqx, dqy, dqtheta
-              ):
+def q_updater(dqx, dqy, dqtheta,
+              qx, qy, qtheta,
+              step):
     """
         Update the position and velocity
         Update the Stochastic Brownian motion
@@ -283,7 +284,7 @@ def updater(step, grid, qx, qy, qtheta, px, py, ptheta,
                                               px, py,
                                               Pe, M, Lx, Ly)
 
-    # dqx, dqy, dqtheta = q_gradient_calculator()
+    dqx, dqy, dqtheta = q_gradient_calculator(px, py, ptheta)
 
     # Update q, p
     p_updater(dpx, dpy,
@@ -291,8 +292,9 @@ def updater(step, grid, qx, qy, qtheta, px, py, ptheta,
               s_x, s_y, s_theta,
               step, W)
 
-    q_updater(step, qx, qy, qtheta,
-              px, py, ptheta)
+    q_updater(dqx, dqy, dqtheta,
+              qx, qy, qtheta,
+              step)
 
 
 @jit(nopython=NOPYTHON)
