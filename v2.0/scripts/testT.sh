@@ -15,4 +15,4 @@ cd $HOME/MIPS/v2.0
 # value of Peclet number
 # value of W value 1e-3
 tlst=(100 1000 5000 10000 20000 50000 100000)
-python3 main.py 100000 500 4900 20 ${tlst[$PBS_ARRAYID]} 80 120 100
+python3 main.py 5000 500 4900 20 ${tlst[$PBS_ARRAYID]} 80 120 100
