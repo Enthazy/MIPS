@@ -80,18 +80,18 @@ def circles(x, y, s, c='b', vmin=None, vmax=None, **kwargs):
 def display_circle(qx, qy):
     fig, ax = plt.subplots(1, 1, figsize=(12, 12))
     # Now, we draw our points with a gradient of colors.
-    circles(qx[:len(qx) // 2], qy[:len(qx) // 2], 1 / 2, c='teal')
-    circles(qx[len(qx) // 2:], qy[len(qx) // 2:], 1 / 2, c='coral')
+    circles(qx[:len(qx) // 2], qy[:len(qx) // 2], 1 / 2, ec='teal', fc='none')
+    circles(qx[len(qx) // 2:], qy[len(qx) // 2:], 1 / 2, ec='coral',fc='none')
     ax.axis('equal')
     ax.grid()
 
 def display_arrow(qx, qy, theta, range='all',step=0.5):
     if range == 'all':
         for i,_ in enumerate(qx):
-            plt.arrow(qx[i],qy[i], step*np.cos(theta)[i], step*np.sin(theta)[i], c='white')
+            plt.arrow(qx[i],qy[i], step*np.cos(theta)[i], step*np.sin(theta)[i], color='grey')
     else:
         for i in range:
-            plt.arrow(qx[i],qy[i], step*np.cos(theta)[i], step*np.sin(theta)[i], c='white')
+            plt.arrow(qx[i],qy[i], step*np.cos(theta)[i], step*np.sin(theta)[i], color='grey')
 
 if __name__ == "__main__":
     filepath = sys.argv[1]

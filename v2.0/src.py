@@ -11,7 +11,7 @@ root32 = 2 ** (1 / 3)
 root62 = 2 ** (1 / 6)
 root62n = -1 * 2 ** (1 / 6)
 
-
+@jit(nopython=NOPYTHON)
 def grid_init(M):
     grid = List()
     for i in range(M * M):
