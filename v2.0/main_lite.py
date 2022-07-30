@@ -3,19 +3,19 @@ from time import time
 
 def main():
     # Hyper-parameters
-    epoch = int(1e2)  # how many savesfile will be generated
+    epoch = int(1e1)  # how many savesfile will be generated
     savetime = int(1e3)  # iterations in each epoch
     # how many iterations for each savefile
-    grid_update_time = int(1)  # how many iterations for each grid update
+    grid_update_time = int(50)  # how many iterations for each grid update
 
     N = 4900  # number of particles
     M = 20  # number of grids
-    step = 1e-4
-    Lx = 80  # box size x
+    step = 5e-4
+    Lx = 90  # box size x
     Ly = Lx  # box size y
-    Pe = 150  # Peclet number
-    W = 0.01   # W number
-    is_save = True
+    Pe = 200  # Peclet number
+    W = 1   # W number
+    is_save = False
     is_load = False
     savepoint = 0
     np.random.seed(714)
@@ -51,7 +51,11 @@ def main():
     print("Pe value is: ", Pe)
     import os
     os.makedirs('./results/final_states/', exist_ok=True)
-    os.makedirs("./results/" + "F"+str(folding_frac) + "P"+str(Pe) + "W" + str(int(W*1e3)), exist_ok=True)
+    os.makedirs("./results/"
+                + "F"+str(folding_frac)
+                + "P"+str(Pe)
+                + "W" + str(int(W*1e3))
+                + "T" + str(int(step*1e8)), exist_ok=True)
 
     grid = grid_seperation(grid, qx, qy, M, Lx, Ly)
 

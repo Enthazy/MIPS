@@ -1,8 +1,11 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import sys
-from scipy.spatial import voronoi_plot_2d
-from test import *
+
+import scipy as sp
+import seaborn as sns
+import pandas as pd
+from scipy.spatial import voronoi_plot_2d, ConvexHull
 
 
 def load(file_name):
@@ -18,9 +21,10 @@ def load_points(savepoint):
     qy = data['qy']
     # Lx = data['L']
     # Ly = data['L']
+    L = data['L']
     print("=========Load savepoint successfully=========")
     points = np.array([[qx[i], y] for i, y in enumerate(qy)])
-    box = (0, 120, 0, 120)
+    box = (0, L, 0, L)
     return points, box
 
 
@@ -137,11 +141,11 @@ def presenter(savepoint):
     points, box = load_points(savepoint)
     vor = voronoi(points, box)
     # generate voronoi plot
-    # voronoi_plot(vor)
+    voronoi_plot(vor)
 
     # generate density histogram
-    voronoi_histogram(vor)
-    plt.title("Histogram for epoch "+str(savepoint))
+    # voronoi_histogram(vor)
+    # plt.title("Histogram for epoch "+str(savepoint))
 
     # generate density histogram for multi epoch
     # voronoi_histogram_multi(savepoint, 3)

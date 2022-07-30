@@ -7,7 +7,7 @@ def main():
     epoch = np.int32(sys.argv[1])  # how many savesfile will be generated
     savetime = np.int32(sys.argv[2])  # iterations in each epoch
     # how many iterations for each savefile
-    grid_update_time = int(1)  # how many iterations for each grid update
+    grid_update_time = int(50)  # how many iterations for each grid update
 
     N = np.int32(sys.argv[3])  # number of particles
     M = np.int32(sys.argv[4])  # number of grids

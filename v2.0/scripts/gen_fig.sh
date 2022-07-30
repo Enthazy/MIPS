@@ -7,5 +7,5 @@
 def folderpath=$HOME/MIPS/v2.0/results/final_states
 
 for file in folderpath/*; do
-  echo '$file'
+  echo $file
 done

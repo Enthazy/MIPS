@@ -88,10 +88,10 @@ def display_circle(qx, qy):
 def display_arrow(qx, qy, theta, range='all',step=0.5):
     if range == 'all':
         for i,_ in enumerate(qx):
-            plt.arrow(qx[i],qy[i], step*np.cos(theta)[i], step*np.sin(theta)[i])
+            plt.arrow(qx[i],qy[i], step*np.cos(theta)[i], step*np.sin(theta)[i], c='white')
     else:
         for i in range:
-            plt.arrow(qx[i],qy[i], step*np.cos(theta)[i], step*np.sin(theta)[i])
+            plt.arrow(qx[i],qy[i], step*np.cos(theta)[i], step*np.sin(theta)[i], c='white')
 
 if __name__ == "__main__":
     filepath = sys.argv[1]
