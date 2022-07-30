@@ -99,7 +99,7 @@ if __name__ == "__main__":
     data = load(filepath)
     qx = data['qx']
     qy = data['qy']
-    epoch = data['_e']
+    epoch = data['epoch']
     qtheta = data['qtheta']
     display_arrow(qx, qy, qtheta)
     display_circle(qx, qy)
