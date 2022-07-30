@@ -53,7 +53,11 @@ def main():
     print("W value is: ", W)
     import os
     os.makedirs('./results/final_states/', exist_ok=True)
-    os.makedirs("./results/" + "F"+str(folding_frac) + "P"+str(Pe) + "W" + str(int(W*1e3)), exist_ok=True)
+    os.makedirs("./results/"
+                + "F"+str(folding_frac)
+                + "P"+str(Pe)
+                + "W" + str(int(W*1e3))
+                + "T" + str(int(step*1e8)), exist_ok=True)
 
     grid = grid_seperation(grid, qx, qy, M, Lx, Ly)
 

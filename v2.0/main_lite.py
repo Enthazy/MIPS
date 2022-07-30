@@ -10,7 +10,7 @@ def main():
 
     N = 4900  # number of particles
     M = 20  # number of grids
-    step = 1e-6
+    step = 1e-4
     Lx = 80  # box size x
     Ly = Lx  # box size y
     Pe = 150  # Peclet number
