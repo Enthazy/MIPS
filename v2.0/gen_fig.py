@@ -94,14 +94,15 @@ def display_arrow(qx, qy, theta, range='all',step=0.5):
             plt.arrow(qx[i],qy[i], step*np.cos(theta)[i], step*np.sin(theta)[i])
 
 if __name__ == "__main__":
-    filename = sys.argv[1]
+    filepath = sys.argv[1]
     savepath = sys.argv[2]
-    data = load(filename)
+    data = load(filepath)
     qx = data['qx']
     qy = data['qy']
+    epoch = data['_e']
     qtheta = data['qtheta']
     display_arrow(qx, qy, qtheta)
     display_circle(qx, qy)
     import os
     os.makedirs(savepath, exist_ok=True)
-    plt.savefig(savepath + filename[:-4] + ".png")
+    plt.savefig(savepath + epoch + ".png")
