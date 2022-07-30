@@ -105,4 +105,4 @@ if __name__ == "__main__":
     display_circle(qx, qy)
     import os
     os.makedirs(savepath, exist_ok=True)
-    plt.savefig(savepath + epoch + ".png")
+    plt.savefig(savepath + str(epoch) + ".png")
