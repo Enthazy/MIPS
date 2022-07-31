@@ -3,15 +3,8 @@ from numba.typed import List
 from numba import jit, prange
 from utils import *
 
-# NOPYTHON = False
-NOPYTHON = True
-sqrt6 = np.sqrt(6)
-sqrt2 = np.sqrt(2)
-root32 = 2 ** (1 / 3)
-root62 = 2 ** (1 / 6)
-root62n = -1 * 2 ** (1 / 6)
 
-@jit(nopython=NOPYTHON)
+@jit(nopython=True)
 def grid_init(M):
     grid = List()
     for i in range(M * M):
@@ -19,7 +12,7 @@ def grid_init(M):
     return grid
 
 
-@jit(nopython=NOPYTHON)
+@jit(nopython=True)
 def get_cal_range(grid, indx, indy, M):
     """
       For G(ind1, ind2)
@@ -38,7 +31,7 @@ def get_cal_range(grid, indx, indy, M):
     return r + t + tl + tr
 
 
-@jit(nopython=NOPYTHON, parallel=True)
+@jit(nopython=True, parallel=True)
 def grid_seperation(grid, qx, qy, M, Lx, Ly):
     """
       For G(indx, indy), the index is $ind = indy * M + indx$
@@ -70,7 +63,7 @@ def grid_seperation(grid, qx, qy, M, Lx, Ly):
     return grid
 
 
-@jit(nopython=NOPYTHON)
+@jit(nopython=True)
 def gradient_reduced_LJPotential(x, y, d2):
     """
         calculat the gradient of the FJ potential
@@ -88,7 +81,7 @@ def gradient_reduced_LJPotential(x, y, d2):
     return s * rx, s * ry
 
 
-@jit(nopython=NOPYTHON, parallel=True)
+@jit(nopython=True, parallel=True)
 def interaction_calculator(dpx, dpy,
                            grid, qx, qy,
                            M, Lx, Ly):
@@ -109,6 +102,9 @@ def interaction_calculator(dpx, dpy,
     # ================================================
     # 1. get info for the current grid, find neighbour grid
     # ================================================
+    root32 = np.float32(np.power(2,1/3))
+    root62 = np.float32(np.power(2,1/6))
+    root62n = np.float32(-1*root62)
     for idx_grid in prange(len(grid)):
         # 1.1 get the points in the current grid
         points = grid[idx_grid]  # list[int] of indices of particles
@@ -201,7 +197,7 @@ def interaction_calculator(dpx, dpy,
                             dpy[j] += vpy
 
 
-@jit(nopython=NOPYTHON)
+@jit(nopython=True)
 def p_gradient_calculator(grid, qx, qy, qtheta,
                           px, py,
                           Pe, M, Lx, Ly):
@@ -225,7 +221,7 @@ def p_gradient_calculator(grid, qx, qy, qtheta,
     return dpx, dpy
 
 
-@jit(nopython=NOPYTHON)
+@jit(nopython=True)
 def p_updater(dpx, dpy,
               px, py, ptheta,
               s_x, s_y, s_theta,
@@ -237,6 +233,8 @@ def p_updater(dpx, dpy,
 
     :return:
     """
+    sqrt2 = np.float32(np.sqrt(2))
+    sqrt6 = np.float32(np.sqrt(6))
     sqrt_step = np.sqrt(step)
 
     px += (step * dpx + sqrt2 * sqrt_step * s_x) / W
@@ -245,7 +243,7 @@ def p_updater(dpx, dpy,
     return px, py, ptheta
 
 
-@jit(nopython=NOPYTHON)
+@jit(nopython=True)
 def q_gradient_calculator(px, py, ptheta):
     """
         Update the position and velocity
@@ -259,7 +257,7 @@ def q_gradient_calculator(px, py, ptheta):
     return dqx, dqy, dqtheta
 
 
-@jit(nopython=NOPYTHON)
+@jit(nopython=True)
 def q_updater(dqx, dqy, dqtheta,
               qx, qy, qtheta,
               step):
@@ -274,7 +272,7 @@ def q_updater(dqx, dqy, dqtheta,
     qtheta += step * dqtheta
 
 
-@jit(nopython=NOPYTHON)
+@jit(nopython=True)
 def updater(step, grid, qx, qy, qtheta, px, py, ptheta,
             s_x, s_y, s_theta,
             Pe, W, M, Lx, Ly):
@@ -297,7 +295,7 @@ def updater(step, grid, qx, qy, qtheta, px, py, ptheta,
               step)
 
 
-@jit(nopython=NOPYTHON)
+@jit(nopython=True)
 def run(step, grid, qx, qy, qtheta, px, py, ptheta,
         s_x, s_y, s_theta,
         Pe, W, M, Lx, Ly):

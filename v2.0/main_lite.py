@@ -3,19 +3,19 @@ from time import time
 
 def main():
     # Hyper-parameters
-    epoch = int(1e1)  # how many savesfile will be generated
-    savetime = int(1e3)  # iterations in each epoch
+    epoch = int(1e6)  # how many savesfile will be generated
+    savetime = int(1e0)  # iterations in each epoch
     # how many iterations for each savefile
-    grid_update_time = int(50)  # how many iterations for each grid update
+    grid_update_time = int(1)  # how many iterations for each grid update
 
     N = 4900  # number of particles
     M = 20  # number of grids
-    step = 5e-4
+    step = 4e-4
     Lx = 90  # box size x
     Ly = Lx  # box size y
     Pe = 200  # Peclet number
     W = 1   # W number
-    is_save = False
+    is_save = True
     is_load = False
     savepoint = 0
     np.random.seed(714)
@@ -25,10 +25,12 @@ def main():
         coords = generate_points_with_min_distance(n=N, shape=(Lx * 0.98, Ly * 0.98), min_dist=1)
         qx = np.array(coords[:, 0]).astype(np.float32)
         qy = np.array(coords[:, 1]).astype(np.float32)
-        qtheta = np.random.randn(N).astype(np.float32)
+        qtheta = np.random.uniform(0, 2* np.pi, N).astype(np.float32)
 
-        px = np.zeros(N).astype(np.float32)
-        py = np.zeros(N).astype(np.float32)
+        # px = np.zeros(N).astype(np.float32)
+        # py = np.zeros(N).astype(np.float32)
+        px = np.random.randn(N).astype(np.float32) * Pe / 2
+        py = np.random.randn(N).astype(np.float32) * Pe / 2
         ptheta = np.zeros(N).astype(np.float32)
         return qx, qy, qtheta, px, py, ptheta
 
