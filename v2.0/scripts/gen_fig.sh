@@ -4,8 +4,9 @@
 #PBS -q standard
 #PBS -k oe
 
-folderpath=$HOME/MIPS/v2.0/results/F60P120W1000T100000
-savepath=$HOME/MIPS/v2.0/fig/F60P120W1000T100000/
+folder=F60P120W1000T100000
+folderpath=$HOME/MIPS/v2.0/results/$folder
+savepath=$HOME/MIPS/v2.0/fig/$folder/
 
 cd $HOME/MIPS/v2.0
 
