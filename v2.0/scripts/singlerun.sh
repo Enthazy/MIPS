@@ -13,4 +13,4 @@ cd $HOME/MIPS/v2.0
 # simulation size
 # value of Peclet number
 # value of W value 1e-3
-python3 main.py 1000 1000 4900 20 100000 80 120 1000
+python3 main.py 3000 1000 4900 20 100000 80 120 1000
