@@ -28,8 +28,10 @@ def main():
         qy = np.array(coords[:, 1]).astype(np.float32)
         qtheta = np.random.randn(N).astype(np.float32)
 
-        px = np.zeros(N).astype(np.float32)
-        py = np.zeros(N).astype(np.float32)
+        # px = np.zeros(N).astype(np.float32)
+        # py = np.zeros(N).astype(np.float32)
+        px = np.random.randn(N).astype(np.float32) * Pe / 2
+        py = np.random.randn(N).astype(np.float32) * Pe / 2
         ptheta = np.zeros(N).astype(np.float32)
         return qx, qy, qtheta, px, py, ptheta
 
