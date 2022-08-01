@@ -29,8 +29,8 @@ def main():
 
         # px = np.zeros(N).astype(np.float32)
         # py = np.zeros(N).astype(np.float32)
-        px = np.random.randn(N).astype(np.float32) * Pe / 2
-        py = np.random.randn(N).astype(np.float32) * Pe / 2
+        px = np.random.uniform(-1,1,N).astype(np.float32) * Pe / 2
+        py = np.random.uniform(-1,1,N).astype(np.float32) * Pe / 2
         ptheta = np.zeros(N).astype(np.float32)
         return qx, qy, qtheta, px, py, ptheta
 

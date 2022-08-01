@@ -1,6 +1,9 @@
 from src import *
 from time import time
 
+W_unit = 1e-5
+step_unit = 1e-8
+
 def main():
     import sys
     # Hyper-parameters
@@ -15,7 +18,7 @@ def main():
     Lx = np.int32(sys.argv[6])  # box size x
     Ly = np.int32(sys.argv[6])  # box size y
     Pe = np.int32(sys.argv[7])  # Peclet number
-    W = np.float32(int(sys.argv[8]) * 1e-3)   # W number
+    W = np.float32(int(sys.argv[8]) * W_unit)   # W number
     is_save = True
     is_load = False
     savepoint = 0
@@ -30,8 +33,8 @@ def main():
 
         # px = np.zeros(N).astype(np.float32)
         # py = np.zeros(N).astype(np.float32)
-        px = np.random.randn(N).astype(np.float32) * Pe / 2
-        py = np.random.randn(N).astype(np.float32) * Pe / 2
+        px = np.random.uniform(-1,1,N).astype(np.float32) * Pe / 2
+        py = np.random.uniform(-1,1,N).astype(np.float32) * Pe / 2
         ptheta = np.zeros(N).astype(np.float32)
         return qx, qy, qtheta, px, py, ptheta
 
@@ -58,8 +61,8 @@ def main():
     os.makedirs("./results/"
                 + "F"+str(folding_frac)
                 + "P"+str(Pe)
-                + "W" + str(int(W*1e3))
-                + "T" + str(int(step*1e8)), exist_ok=True)
+                + "W" + str(int(W*W_unit))
+                + "T" + str(int(step*step_unit)), exist_ok=True)
 
     grid = grid_seperation(grid, qx, qy, M, Lx, Ly)
 
@@ -110,15 +113,15 @@ def main():
             save("./results/"
                  + "F"+str(folding_frac)
                  + "P"+str(Pe)
-                 + "W" + str(int(W*1e3))
-                 + "T" + str(int(step*1e8))
+                 + "W" + str(int(W*W_unit))
+                 + "T" + str(int(step*step_unit))
                  + "/"
                  + str(_e) + ".npz", data)
     save("./results/final_states/"
          + "F"+str(folding_frac)
          + "P"+str(Pe)
-         + "W" + str(int(W*1e3))
-         + "T" + str(int(step*1e8))
+         + "W" + str(int(W*W_unit))
+         + "T" + str(int(step*step_unit))
          + ".npz", data)
     return qx, qy
 
