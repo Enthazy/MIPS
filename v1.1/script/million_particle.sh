@@ -7,18 +7,17 @@
 
 cd $HOME/MIPS/v1.1
 # number of output data
-epoch=300
+epoch=100000
 # number of iteration in each data
-savenum=3
+savenum=1
 # number of particles
-N=10000
+N=1000000
 # number of grids
-M=20
+M=100
 # time step 1e-8
-tlst=(1 10 100 500 1000 5000 10000 50000)
-step=${tlst[$PBS_ARRAYID]}
+step=500
 # simulation size
-L=120
+L=1200
 # value of Peclet number
 Pe=120
 
