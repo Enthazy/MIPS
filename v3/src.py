@@ -295,6 +295,8 @@ def euler_updater(qx, qy, qtheta, px, py, ptheta,
               ax, ay, qtheta,
               step)
 
+
+@jit(nopython=True)
 def leapfrog_updater(qx, qy, qtheta, px, py, ptheta,
                      ax, ay,
                      s_x, s_y, s_theta,
