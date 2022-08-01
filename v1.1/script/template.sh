@@ -5,7 +5,7 @@
 #PBS -k oe
 #PBS -t 0
 
-cd $HOME/MIPS/v3
+cd $HOME/MIPS/v1.1
 # number of output data
 epoch=3
 # number of iteration in each data
@@ -35,7 +35,7 @@ SavePath=$HOME/MIPS/v3/fig/${name}/
 FinalPath=$HOME/MIPS/v3/results/final/${name}.npz
 FinalSavePath=$HOME/MIPS/v3/fig/final/${name}/
 
-cd $HOME/MIPS/v3
+cd $HOME/MIPS/v1.1
 
 python3 gen_fig.py ${FinalPath} ${FinalSavePath}
 
