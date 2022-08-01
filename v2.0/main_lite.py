@@ -1,6 +1,9 @@
 from src import *
 from time import time
 
+W_unit = 1e-5
+step_unit = 1e-8
+
 def main():
     # Hyper-parameters
     epoch = int(1e6)  # how many savesfile will be generated
@@ -15,7 +18,7 @@ def main():
     Ly = Lx  # box size y
     Pe = 200  # Peclet number
     W = 1   # W number
-    is_save = True
+    is_save = False
     is_load = False
     savepoint = 0
     np.random.seed(714)
@@ -25,16 +28,19 @@ def main():
         coords = generate_points_with_min_distance(n=N, shape=(Lx * 0.98, Ly * 0.98), min_dist=1)
         qx = np.array(coords[:, 0]).astype(np.float32)
         qy = np.array(coords[:, 1]).astype(np.float32)
-        qtheta = np.random.uniform(0, 2* np.pi, N).astype(np.float32)
+        qtheta = np.random.randn(N).astype(np.float32)
+
+        ax = np.copy(qx)
+        ay = np.copy(qy)
 
         # px = np.zeros(N).astype(np.float32)
         # py = np.zeros(N).astype(np.float32)
         px = np.random.uniform(-1,1,N).astype(np.float32) * Pe / 2
         py = np.random.uniform(-1,1,N).astype(np.float32) * Pe / 2
         ptheta = np.zeros(N).astype(np.float32)
-        return qx, qy, qtheta, px, py, ptheta
+        return qx, qy, qtheta, px, py, ptheta, ax, ay
 
-    qx, qy, qtheta, px, py, ptheta = init(N)
+    qx, qy, qtheta, px, py, ptheta, ax, ay = init(N)
     grid = grid_init(M)
 
     if is_load:
@@ -44,20 +50,21 @@ def main():
         qy = data['qy']
         px = data['px']
         py = data['py']
-        theta = data['theta']
+        qtheta = data['qtheta']
         print("=========Load savepoint successfully=========")
 
     # Calculate physical quantities
     folding_frac = int(cal_folding(N, Lx, Ly)*100)
     print("folding ratio is: ", folding_frac)
     print("Pe value is: ", Pe)
+    print("W value is: ", W)
     import os
-    os.makedirs('./results/final_states/', exist_ok=True)
+    os.makedirs('./results/final/', exist_ok=True)
     os.makedirs("./results/"
                 + "F"+str(folding_frac)
                 + "P"+str(Pe)
-                + "W" + str(int(W*1e3))
-                + "T" + str(int(step*1e8)), exist_ok=True)
+                + "W" + str(int(round(W/W_unit)))
+                + "T" + str(int(round(step/step_unit))), exist_ok=True)
 
     grid = grid_seperation(grid, qx, qy, M, Lx, Ly)
 
@@ -65,8 +72,8 @@ def main():
     rng = np.random.default_rng(seed=0)
     # Run
 
-    @njit()
-    def body(grid, qx, qy, qtheta, px, py, ptheta, random_pool):
+    # @njit()
+    def body(qx, qy, qtheta, px, py, ptheta, ax, ay, grid, random_pool):
         for _ in range(savetime):
             # get random variables
             _N = _*3*N
@@ -74,20 +81,24 @@ def main():
             s_y = random_pool[_N+N:_N+2*N]
             s_theta = random_pool[_N+2*N:_N+3*N]
 
-            qx, qy, qtheta, px, py, ptheta = run(step, grid, qx, qy, qtheta, px, py, ptheta,
-                                         s_x, s_y, s_theta,
-                                         Pe, W, M, Lx, Ly)
+            qx, qy, qtheta, px, py, ptheta, ax, ay = run(qx, qy, qtheta, px, py, ptheta,
+                                                         ax, ay,
+                                                         s_x, s_y, s_theta,
+                                                         grid, step, Pe, W, M, Lx, Ly)
 
             if _ % grid_update_time == 0:
                 grid = grid_seperation(grid, qx, qy, M, Lx, Ly)
-        return qx, qy, qtheta, px, py, ptheta
+        return qx, qy, qtheta, px, py, ptheta, ax, ay
 
 
     # Main Loop
     for _e in range(epoch):
         T1 = time()
         random_pool = rng.standard_normal(3*N*savetime, dtype=np.float32)
-        qx, qy, qtheta, px, py, ptheta = body(grid, qx, qy, qtheta, px, py, ptheta, random_pool)
+        qx, qy, qtheta, px, py, ptheta, ax, ay = body(qx, qy, qtheta,
+                                                      px, py, ptheta,
+                                                      ax, ay,
+                                                      grid, random_pool)
         T2 = time()
         print("time: ", T2-T1)
         if is_save:
@@ -104,19 +115,21 @@ def main():
                     'px': px,
                     'py': py,
                     'ptheta': ptheta,
+                    'ax': ax,
+                    'ay': ay,
                     }
             save("./results/"
                  + "F"+str(folding_frac)
                  + "P"+str(Pe)
-                 + "W" + str(int(W*1e3))
-                 + "T" + str(int(step*1e8))
+                 + "W" + str(int(round(W/W_unit)))
+                 + "T" + str(int(round(step/step_unit)))
                  + "/"
                  + str(_e) + ".npz", data)
-    save("./results/final_states/"
+    save("./results/final/"
          + "F"+str(folding_frac)
          + "P"+str(Pe)
-         + "W" + str(int(W*1e3))
-         + "T" + str(int(step*1e8))
+         + "W" + str(int(round(W/W_unit)))
+         + "T" + str(int(round(step/step_unit)))
          + ".npz", data)
     return qx, qy
 

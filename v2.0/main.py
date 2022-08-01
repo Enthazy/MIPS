@@ -1,3 +1,5 @@
+import numpy as np
+
 from src import *
 from time import time
 
@@ -31,14 +33,17 @@ def main():
         qy = np.array(coords[:, 1]).astype(np.float32)
         qtheta = np.random.randn(N).astype(np.float32)
 
+        ax = np.copy(qx)
+        ay = np.copy(qy)
+
         # px = np.zeros(N).astype(np.float32)
         # py = np.zeros(N).astype(np.float32)
         px = np.random.uniform(-1,1,N).astype(np.float32) * Pe / 2
         py = np.random.uniform(-1,1,N).astype(np.float32) * Pe / 2
         ptheta = np.zeros(N).astype(np.float32)
-        return qx, qy, qtheta, px, py, ptheta
+        return qx, qy, qtheta, px, py, ptheta, ax, ay
 
-    qx, qy, qtheta, px, py, ptheta = init(N)
+    qx, qy, qtheta, px, py, ptheta, ax, ay = init(N)
     grid = grid_init(M)
 
     if is_load:
@@ -70,8 +75,8 @@ def main():
     rng = np.random.default_rng(seed=0)
     # Run
 
-    @njit()
-    def body(grid, qx, qy, qtheta, px, py, ptheta, random_pool):
+    # @njit()
+    def body(qx, qy, qtheta, px, py, ptheta, ax, ay, grid, random_pool):
         for _ in range(savetime):
             # get random variables
             _N = _*3*N
@@ -79,20 +84,24 @@ def main():
             s_y = random_pool[_N+N:_N+2*N]
             s_theta = random_pool[_N+2*N:_N+3*N]
 
-            qx, qy, qtheta, px, py, ptheta = run(step, grid, qx, qy, qtheta, px, py, ptheta,
-                                                 s_x, s_y, s_theta,
-                                                 Pe, W, M, Lx, Ly)
+            qx, qy, qtheta, px, py, ptheta, ax, ay = run(qx, qy, qtheta, px, py, ptheta,
+                                                         ax, ay,
+                                                         s_x, s_y, s_theta,
+                                                         grid, step, Pe, W, M, Lx, Ly)
 
             if _ % grid_update_time == 0:
                 grid = grid_seperation(grid, qx, qy, M, Lx, Ly)
-        return qx, qy, qtheta, px, py, ptheta
+        return qx, qy, qtheta, px, py, ptheta, ax, ay
 
 
     # Main Loop
     for _e in range(epoch):
         T1 = time()
         random_pool = rng.standard_normal(3*N*savetime, dtype=np.float32)
-        qx, qy, qtheta, px, py, ptheta = body(grid, qx, qy, qtheta, px, py, ptheta, random_pool)
+        qx, qy, qtheta, px, py, ptheta, ax, ay = body(qx, qy, qtheta,
+                                                      px, py, ptheta,
+                                                      ax, ay,
+                                                      grid, random_pool)
         T2 = time()
         print("time: ", T2-T1)
         if is_save:
@@ -109,6 +118,8 @@ def main():
                     'px': px,
                     'py': py,
                     'ptheta': ptheta,
+                    'ax': ax,
+                    'ay': ay,
                     }
             save("./results/"
                  + "F"+str(folding_frac)
