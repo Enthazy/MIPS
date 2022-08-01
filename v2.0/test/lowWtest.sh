@@ -7,9 +7,9 @@
 
 cd $HOME/MIPS/v2.0
 # number of output data
-epoch=20
+epoch=50000
 # number of iteration in each data
-savenum=1
+savenum=10
 # number of particles
 N=10000
 # number of grids
