@@ -30,10 +30,10 @@ folding=$((${N}*31415926/(400000*L*L)))
 
 name=F${folding}P${Pe}T${step}
 
-folderpath=$HOME/MIPS/v3/results/${name}
-SavePath=$HOME/MIPS/v3/fig/${name}/
-FinalPath=$HOME/MIPS/v3/results/final/${name}.npz
-FinalSavePath=$HOME/MIPS/v3/fig/final/${name}/
+folderpath=$HOME/MIPS/v1.1/results/${name}
+SavePath=$HOME/MIPS/v1.1/fig/${name}/
+FinalPath=$HOME/MIPS/v1.1/results/final/${name}.npz
+FinalSavePath=$HOME/MIPS/v1.1/fig/final/${name}/
 
 cd $HOME/MIPS/v1.1
 
@@ -45,6 +45,6 @@ done
 
 # generate video
 picLoadPath=${SavePath}
-videoSavePath=$HOME/MIPS/v3/video/
+videoSavePath=$HOME/MIPS/v1.1/video/
 
 python3 gen_gif.py 0 ${epoch} ${name}.avi ${picLoadPath} ${videoSavePath}
