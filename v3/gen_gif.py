@@ -24,7 +24,7 @@ if __name__ == "__main__":
     os.makedirs(savepath, exist_ok=True)
     startpoint=len(folderpath)
     print('Creating gif\n')
-    with imageio.get_writer('mygif.avi', mode='I', fps=48) as writer:
+    with imageio.get_writer(savepath+name, mode='I', fps=48) as writer:
         for filename in sorted(os.scandir(folderpath), key=lambda s: int(s.path[startpoint:-4])):
             if int(start) <= int(filename.path[startpoint:-4]) <= int(end):
                 print(filename.path)

@@ -49,4 +49,4 @@ done
 picLoadPath=${SavePath}
 videoSavePath=$HOME/MIPS/v3/video
 
-python3 gen_gif.py 0 ${epoch} ${name} ${picLoadPath} ${videoSavePath}
+python3 gen_gif.py 0 ${epoch} ${name}.avi ${picLoadPath} ${videoSavePath}
