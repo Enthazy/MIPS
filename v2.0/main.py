@@ -61,8 +61,8 @@ def main():
     os.makedirs("./results/"
                 + "F"+str(folding_frac)
                 + "P"+str(Pe)
-                + "W" + str(int(W/W_unit))
-                + "T" + str(int(step/step_unit)), exist_ok=True)
+                + "W" + str(int(round(W/W_unit)))
+                + "T" + str(int(round(step/step_unit))), exist_ok=True)
 
     grid = grid_seperation(grid, qx, qy, M, Lx, Ly)
 
@@ -113,15 +113,15 @@ def main():
             save("./results/"
                  + "F"+str(folding_frac)
                  + "P"+str(Pe)
-                 + "W" + str(int(W*W_unit))
-                 + "T" + str(int(step/step_unit))
+                 + "W" + str(int(round(W/W_unit)))
+                 + "T" + str(int(round(step/step_unit)))
                  + "/"
                  + str(_e) + ".npz", data)
     save("./results/final_states/"
          + "F"+str(folding_frac)
          + "P"+str(Pe)
-         + "W" + str(int(W*W_unit))
-         + "T" + str(int(step/step_unit))
+         + "W" + str(int(round(W/W_unit)))
+         + "T" + str(int(round(step/step_unit)))
          + ".npz", data)
     return qx, qy
 
