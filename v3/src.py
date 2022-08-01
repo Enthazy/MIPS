@@ -4,7 +4,7 @@ from numba import jit, prange
 from utils import *
 
 
-# @jit(nopython=True)
+@jit(nopython=True)
 def grid_init(M):
     grid = List()
     for i in range(M * M):
@@ -12,7 +12,7 @@ def grid_init(M):
     return grid
 
 
-# @jit(nopython=True)
+@jit(nopython=True)
 def get_cal_range(grid, indx, indy, M):
     """
       For G(ind1, ind2)
@@ -31,7 +31,7 @@ def get_cal_range(grid, indx, indy, M):
     return r + t + tl + tr
 
 
-# @jit(nopython=True, parallel=True)
+@jit(nopython=True, parallel=True)
 def grid_seperation(grid, qx, qy, M, Lx, Ly):
     """
       For G(indx, indy), the index is $ind = indy * M + indx$
@@ -63,7 +63,7 @@ def grid_seperation(grid, qx, qy, M, Lx, Ly):
     return grid
 
 
-# @jit(nopython=True)
+@jit(nopython=True)
 def gradient_reduced_LJPotential(x, y, d2):
     """
         calculat the gradient of the FJ potential
@@ -81,7 +81,7 @@ def gradient_reduced_LJPotential(x, y, d2):
     return s * rx, s * ry
 
 
-# @jit(nopython=True, parallel=True)
+@jit(nopython=True, parallel=True)
 def interaction_calculator(dpx, dpy,
                            grid, qx, qy,
                            M, Lx, Ly):
@@ -197,7 +197,7 @@ def interaction_calculator(dpx, dpy,
                             dpy[j] += vpy
 
 
-# @jit(nopython=True)
+@jit(nopython=True)
 def p_gradient_calculator(grid, qx, qy, qtheta,
                           px, py,
                           Pe, M, Lx, Ly):
@@ -221,7 +221,7 @@ def p_gradient_calculator(grid, qx, qy, qtheta,
     return dpx, dpy
 
 
-# @jit(nopython=True)
+@jit(nopython=True)
 def p_updater(dpx, dpy,
               px, py, ptheta,
               s_x, s_y, s_theta,
@@ -243,7 +243,7 @@ def p_updater(dpx, dpy,
     return px, py, ptheta
 
 
-# @jit(nopython=True)
+@jit(nopython=True)
 def q_gradient_calculator(px, py, ptheta):
     """
         Update the position and velocity
@@ -257,7 +257,7 @@ def q_gradient_calculator(px, py, ptheta):
     return dqx, dqy, dqtheta
 
 
-# @jit(nopython=True)
+@jit(nopython=True)
 def q_updater(dqx, dqy, dqtheta,
               qx, qy, qtheta,
               step):
@@ -272,7 +272,7 @@ def q_updater(dqx, dqy, dqtheta,
     qtheta += step * dqtheta
 
 
-# @jit(nopython=True)
+@jit(nopython=True)
 def euler_updater(qx, qy, qtheta, px, py, ptheta,
                   ax, ay,
                   s_x, s_y, s_theta,
@@ -319,7 +319,7 @@ def leapfrog_updater(qx, qy, qtheta, px, py, ptheta,
 
 
 
-# @jit(nopython=True)
+@jit(nopython=True)
 def run(qx, qy, qtheta, px, py, ptheta,
         ax, ay,
         s_x, s_y, s_theta,

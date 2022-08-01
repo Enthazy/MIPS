@@ -75,7 +75,7 @@ def main():
     rng = np.random.default_rng(seed=0)
     # Run
 
-    # @njit()
+    @njit()
     def body(qx, qy, qtheta, px, py, ptheta, ax, ay, grid, random_pool):
         for _ in range(savetime):
             # get random variables
