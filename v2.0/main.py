@@ -14,7 +14,7 @@ def main():
 
     N = np.int32(sys.argv[3])  # number of particles
     M = np.int32(sys.argv[4])  # number of grids
-    step = np.float32(float(sys.argv[5]) * 1e-8) # time step
+    step = np.float32(float(sys.argv[5]) * step_unit) # time step
     Lx = np.int32(sys.argv[6])  # box size x
     Ly = np.int32(sys.argv[6])  # box size y
     Pe = np.int32(sys.argv[7])  # Peclet number
@@ -61,8 +61,8 @@ def main():
     os.makedirs("./results/"
                 + "F"+str(folding_frac)
                 + "P"+str(Pe)
-                + "W" + str(int(W*W_unit))
-                + "T" + str(int(step*step_unit)), exist_ok=True)
+                + "W" + str(int(W/W_unit))
+                + "T" + str(int(step/step_unit)), exist_ok=True)
 
     grid = grid_seperation(grid, qx, qy, M, Lx, Ly)
 
@@ -114,14 +114,14 @@ def main():
                  + "F"+str(folding_frac)
                  + "P"+str(Pe)
                  + "W" + str(int(W*W_unit))
-                 + "T" + str(int(step*step_unit))
+                 + "T" + str(int(step/step_unit))
                  + "/"
                  + str(_e) + ".npz", data)
     save("./results/final_states/"
          + "F"+str(folding_frac)
          + "P"+str(Pe)
          + "W" + str(int(W*W_unit))
-         + "T" + str(int(step*step_unit))
+         + "T" + str(int(step/step_unit))
          + ".npz", data)
     return qx, qy
 
