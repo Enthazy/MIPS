@@ -103,10 +103,10 @@ def display_arrow(qx, qy, theta, range='all',step=0.5):
             plt.arrow(qx[i],qy[i], step*np.cos(theta)[i], step*np.sin(theta)[i], color='grey')
 
 if __name__ == "__main__":
-    # filepath = sys.argv[1]
-    # savepath = sys.argv[2]
-    filepath = './results/F40P120T400/999.npz'
-    savepath = './fig/F40P120T400/'
+    filepath = sys.argv[1]
+    savepath = sys.argv[2]
+    # filepath = './results/F40P120T400/999.npz'
+    # savepath = './fig/F40P120T400/'
     data = load(filepath)
     qx = data['qx']
     qy = data['qy']
