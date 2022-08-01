@@ -7,7 +7,7 @@
 
 cd $HOME/MIPS/v1.1
 # number of output data
-epoch=3
+epoch=300
 # number of iteration in each data
 savenum=3
 # number of particles
@@ -40,7 +40,10 @@ cd $HOME/MIPS/v1.1
 python3 gen_fig.py ${FinalPath} ${FinalSavePath}
 
 for file in $folderpath/*; do
-  python3 gen_fig.py ${file} ${SavePath}
+  if [[ "${file}" == *00.npz ]]
+  then
+    python3 gen_fig.py ${file} ${SavePath}
+  fi
 done
 
 # generate video
