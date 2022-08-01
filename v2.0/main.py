@@ -117,7 +117,7 @@ def main():
                  + "T" + str(int(round(step/step_unit)))
                  + "/"
                  + str(_e) + ".npz", data)
-    save("./results/final_states/"
+    save("./results/final/"
          + "F"+str(folding_frac)
          + "P"+str(Pe)
          + "W" + str(int(round(W/W_unit)))

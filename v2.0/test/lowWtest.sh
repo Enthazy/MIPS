@@ -7,7 +7,7 @@
 
 cd $HOME/MIPS/v2.0
 # number of output data
-epoch=100
+epoch=20
 # number of iteration in each data
 savenum=1
 # number of particles
@@ -28,12 +28,17 @@ python3 main.py $epoch $savenum $N $M $step $L $Pe $W
 
 folding=$((${N}*31415926/(400000*L*L)))
 
-folder=F${folding}P${Pe}W${W}T${step}
-folderpath=$HOME/MIPS/v2.0/results/$folder
-savepath=$HOME/MIPS/v2.0/fig/$folder/
+name=F${folding}P${Pe}W${W}T${step}
+
+folderpath=$HOME/MIPS/v2.0/results/${name}
+savepath=$HOME/MIPS/v2.0/fig/${name}/
+finalpath=$HOME/MIPS/v2.0/results/final/${name}.npz
+finalsavepath=$HOME/MIPS/v2.0/fig/final/${name}/
 
 cd $HOME/MIPS/v2.0
 
+python3 gen_fig.py ${finalpath} ${finalsavepath}
+
 for file in $folderpath/*; do
-  python3 gen_fig.py $file $savepath
+  python3 gen_fig.py ${file} ${savepath}
 done
