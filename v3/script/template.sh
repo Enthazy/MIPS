@@ -47,6 +47,6 @@ done
 
 # generate video
 picLoadPath=${SavePath}
-videoSavePath=$HOME/MIPS/v3/video
+videoSavePath=$HOME/MIPS/v3/video/
 
 python3 gen_gif.py 0 ${epoch} ${name}.avi ${picLoadPath} ${videoSavePath}
