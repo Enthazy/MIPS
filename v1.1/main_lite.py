@@ -10,10 +10,10 @@ def main():
     # how many iterations for each savefile
     grid_update_time = int(10)  # how many iterations for each grid update
 
-    N = 2500  # number of particles
-    M = 10  # number of grids
-    step = 4e-6
-    Lx = 70  # box size x
+    N = 10000  # number of particles
+    M = 20  # number of grids
+    step = 2e-6
+    Lx = 105  # box size x
     Ly = Lx  # box size y
     Pe = 120  # Peclet number
     is_save = 1

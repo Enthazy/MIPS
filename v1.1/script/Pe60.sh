@@ -1,25 +1,26 @@
 #!/bin/bash
-#PBS -N million_particle
+#PBS -N Pe60
 #PBS -m a
 #PBS -q parallel16
 #PBS -k oe
-#PBS -t 0
+#PBS -t 0-10
 
 cd $HOME/MIPS/v1.1
 # number of output data
-epoch=100000
+epoch=300
 # number of iteration in each data
-savenum=1
+savenum=3
 # number of particles
-N=1000000
+N=10000
 # number of grids
-M=100
+M=20
 # time step 1e-8
 step=500
 # simulation size
-L=1200
+Llst=(105 110 115 120 125 130 135 140 145 150 155)
+L=${Llst[$PBS_ARRAYID]}
 # value of Peclet number
-Pe=120
+Pe=60
 
 python3 main.py $epoch $savenum $N $M $step $L $Pe
 
