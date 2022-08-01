@@ -85,6 +85,15 @@ def display_circle(qx, qy):
     ax.axis('equal')
     ax.grid()
 
+def display_ball(qx, qy):
+    fig, ax = plt.subplots(1, 1, figsize=(12, 12))
+    # Now, we draw our points with a gradient of colors.
+    circles(qx[:len(qx) // 2], qy[:len(qx) // 2], 1 / 2, c='teal')
+    circles(qx[len(qx) // 2:], qy[len(qx) // 2:], 1 / 2, c='coral')
+    ax.axis('equal')
+    ax.grid()
+
+
 def display_arrow(qx, qy, theta, range='all',step=0.5):
     if range == 'all':
         for i,_ in enumerate(qx):

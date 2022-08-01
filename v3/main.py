@@ -26,7 +26,7 @@ def main():
     savepoint = 0
     np.random.seed(714)
 
-    # Initialization ===============================================
+    # Initialization ========================================================================================
     def init(N):
         coords = generate_points_with_min_distance(n=N, shape=(Lx * 0.98, Ly * 0.98), min_dist=1)
         qx = np.array(coords[:, 0])
@@ -73,8 +73,9 @@ def main():
 
     # Random generator
     rng = np.random.default_rng(seed=0)
-    # Run
 
+
+    # Run=================================================================================================
     @njit()
     def body(qx, qy, qtheta, px, py, ptheta, ax, ay, grid, random_pool):
         for _ in range(savetime):
