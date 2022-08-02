@@ -112,8 +112,13 @@ if __name__ == "__main__":
     qy = data['qy']
     epoch = data['epoch']
     qtheta = data['qtheta']
+
     display_circle(qx, qy)
     display_arrow(qx, qy, qtheta)
+
     import os
     os.makedirs(savepath, exist_ok=True)
+
+    plt.xlim(0, data['L'])
+    plt.ylim(0, data['L'])
     plt.savefig(savepath + str(epoch) + ".png")

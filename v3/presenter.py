@@ -99,6 +99,7 @@ def display_arrow(qx, qy, theta, range='all',step=0.5):
 if __name__ == "__main__":
     filepath = 'test/results/F0P200W100000T40000/0.npz'
     savepath = './test/fig/'
+
     data = load(filepath)
     qx = data['qx']
     qy = data['qy']
