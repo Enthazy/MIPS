@@ -81,12 +81,10 @@ def circles(x, y, s, c='b', vmin=None, vmax=None, **kwargs):
 
 
 def display_circle(qx, qy):
-    fig, ax = plt.subplots(1, 1, figsize=(12, 12))
     # Now, we draw our points with a gradient of colors.
     circles(qx[:len(qx) // 2], qy[:len(qx) // 2], 1 / 2, ec='teal', fc='none')
     circles(qx[len(qx) // 2:], qy[len(qx) // 2:], 1 / 2, ec='coral',fc='none')
-    ax.axis('equal')
-    ax.grid()
+    plt.grid(alpha=0.5)
 
 def display_arrow(qx, qy, theta, range='all',step=0.5):
     if range == 'all':
@@ -106,6 +104,7 @@ if __name__ == "__main__":
     epoch = data['epoch']
     qtheta = data['qtheta']
 
+    fig = plt.figure(figsize=(8, 8))
     display_circle(qx, qy)
     display_arrow(qx, qy, qtheta)
 

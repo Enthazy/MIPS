@@ -20,7 +20,7 @@ def main():
     is_save = True
     is_load = False
     savepoint = 0
-    seed = 123
+    seed = 123 #np.random.randint(1000)
     np.random.seed(seed)
 
     # Initialization ========================================================================================

@@ -31,16 +31,16 @@ def main():
         coords = generate_points_with_min_distance(n=N, shape=(Lx * 0.98, Ly * 0.98), min_dist=1)
         qx = np.array(coords[:, 0])
         qy = np.array(coords[:, 1])
-        qtheta = np.random.randn(N)
+        qtheta = np.random.uniform(0,2*np.pi,N)
 
         ax = np.copy(qx)
         ay = np.copy(qy)
 
         # px = np.zeros(N).astype(np.float64)
         # py = np.zeros(N).astype(np.float64)
-        px = np.random.uniform(-1,1,N) * Pe / 2
-        py = np.random.uniform(-1,1,N) * Pe / 2
-        ptheta = np.zeros(N)
+        px = np.cos(qtheta) * Pe
+        py = np.sin(qtheta) * Pe
+        ptheta = np.random.randn(N)
         return qx, qy, qtheta, px, py, ptheta, ax, ay
 
     qx, qy, qtheta, px, py, ptheta, ax, ay = init(N)

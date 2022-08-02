@@ -36,8 +36,8 @@ def main():
 
         # px = np.zeros(N)
         # py = np.zeros(N)
-        px = np.random.uniform(-1,1,N) * Pe / 2
-        py = np.random.uniform(-1,1,N) * Pe / 2
+        px = np.cos(qtheta) * Pe
+        py = np.sin(qtheta) * Pe
         ptheta = np.zeros(N)
         return qx, qy, qtheta, px, py, ptheta, ax, ay
 
