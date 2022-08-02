@@ -9,7 +9,7 @@ def main():
     epoch = np.int64(sys.argv[1])  # how many savesfile will be generated
     savetime = np.int64(sys.argv[2])  # iterations in each epoch
     # how many iterations for each savefile
-    grid_update_time = int(1)  # how many iterations for each grid update
+    grid_update_time = int(20)  # how many iterations for each grid update
 
     N = np.int64(sys.argv[3])  # number of particles
     M = np.int64(sys.argv[4])  # number of grids
@@ -20,7 +20,8 @@ def main():
     is_save = True
     is_load = False
     savepoint = 0
-    np.random.seed(714)
+    seed = 123
+    np.random.seed(seed)
 
     # Initialization ========================================================================================
     def init(N):
@@ -65,7 +66,7 @@ def main():
     grid = grid_seperation(grid, qx, qy, M, Lx, Ly)
 
     # Random generator
-    rng = np.random.default_rng(seed=0)
+    rng = np.random.default_rng(seed=seed)
 
 
     # Run=================================================================================================

@@ -6,12 +6,12 @@ step_unit = 1e-8
 def main():
     # Hyper-parameters
     epoch = int(1e3)  # how many savesfile will be generated
-    savetime = int(1e1)  # iterations in each epoch
+    savetime = int(1e3)  # iterations in each epoch
     # how many iterations for each savefile
     grid_update_time = int(10)  # how many iterations for each grid update
 
     N = 10000  # number of particles
-    M = 20  # number of grids
+    M = 30  # number of grids
     step = 2e-6
     Lx = 105  # box size x
     Ly = Lx  # box size y

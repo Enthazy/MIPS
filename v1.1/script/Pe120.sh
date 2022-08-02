@@ -7,13 +7,13 @@
 
 cd $HOME/MIPS/v1.1
 # number of output data
-epoch=500000
+epoch=50000
 # number of iteration in each data
 savenum=100
 # number of particles
 N=10000
 # number of grids
-M=20
+M=32
 # time step 1e-8
 step=500
 # simulation size
