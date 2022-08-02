@@ -15,7 +15,7 @@ N=1000000
 # number of grids
 M=100
 # time step 1e-8
-step=500
+step=550
 # simulation size
 L=1200
 # value of Peclet number
