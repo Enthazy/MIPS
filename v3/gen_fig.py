@@ -116,4 +116,5 @@ if __name__ == "__main__":
 
     plt.xlim(0, data['L'])
     plt.ylim(0, data['L'])
+    plt.title(epoch)
     plt.savefig(savepath + str(epoch) + ".png")
