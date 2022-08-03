@@ -102,9 +102,9 @@ def interaction_calculator(dpx, dpy,
     # ================================================
     # 1. get info for the current grid, find neighbour grid
     # ================================================
-    root64 = np.float64(np.power(2,1/3))
-    root62 = np.float64(np.power(2,1/6))
-    root62n = np.float64(-1*root62)
+    root64 = np.float64(np.power(2, 1 / 3))
+    root62 = np.float64(np.power(2, 1 / 6))
+    root62n = np.float64(-1 * root62)
     for idx_grid in prange(len(grid)):
         # 1.1 get the points in the current grid
         points = grid[idx_grid]  # list[int] of indices of particles
@@ -239,7 +239,7 @@ def p_updater(dpx, dpy,
 
     px += (step * dpx + sqrt2 * sqrt_step * s_x) / W
     py += (step * dpy + sqrt2 * sqrt_step * s_y) / W
-    ptheta += sqrt6 * sqrt_step * s_theta / (3*W/8)
+    ptheta += (-1 * step * ptheta + sqrt6 * sqrt_step * s_theta) / (3 * W / 8)
     return px, py, ptheta
 
 
@@ -277,11 +277,10 @@ def euler_updater(qx, qy, qtheta, px, py, ptheta,
                   ax, ay,
                   s_x, s_y, s_theta,
                   grid, step, Pe, W, M, Lx, Ly):
-
     # Calculate dq, dp
     dpx, dpy = p_gradient_calculator(grid, qx, qy, qtheta,
-                                              px, py,
-                                              Pe, M, Lx, Ly)
+                                     px, py,
+                                     Pe, M, Lx, Ly)
 
     dqx, dqy, dqtheta = q_gradient_calculator(px, py, ptheta)
 
@@ -301,7 +300,6 @@ def leapfrog_updater(qx, qy, qtheta, px, py, ptheta,
                      ax, ay,
                      s_x, s_y, s_theta,
                      grid, step, Pe, W, M, Lx, Ly):
-
     # Calculate dq, dp
     dpx, dpy = p_gradient_calculator(grid, qx, qy, qtheta,
                                      px, py,
@@ -320,13 +318,11 @@ def leapfrog_updater(qx, qy, qtheta, px, py, ptheta,
               step)
 
 
-
 @jit(nopython=True)
 def run(qx, qy, qtheta, px, py, ptheta,
         ax, ay,
         s_x, s_y, s_theta,
         grid, step, Pe, W, M, Lx, Ly):
-
     leapfrog_updater(qx, qy, qtheta, px, py, ptheta,
                      ax, ay,
                      s_x, s_y, s_theta,
